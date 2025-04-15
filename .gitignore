@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+chrome_profile/
+*.log
+*.bak
+*.swp
+*.DS_Store

@@ -1,0 +1,180 @@
+{
+  "$schema": "",
+  "basics": {
+    "name": "Abraham Paul Jaison",
+    "label": "",
+    "image": "",
+    "email": "abrahampauljaison2@gmail.com",
+    "phone": "0489209259",
+    "url": "",
+    "summary": "Master's student in Artificial Intelligence and Machine Learning at The University of Adelaide, seeking a retail role\nto further develop my people skills while balancing my studies. With 6 months of retail experience, I am a quick\nlearner, highly adaptable, and thrive in fast-paced environments. I have a strong customer-first approach and\nwork effectively both independently and in team settings.\nI am available to work any shift on all days.\n",
+    "location": {
+      "address": "184 Walkerville Terrace, Walkerville SA 5081",
+      "postalCode": "",
+      "city": "",
+      "countryCode": "",
+      "region": "Australia"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "position": "Sales Associate",
+      "url": "",
+      "startDate": "2024-08-07",
+      "endDate": "2025-01-21",
+      "summary": "- Assisted customers with questions and provided product recommendations.\n- Restocked shelves and conducted stock counts regularly.\n- Operated the cash register.\n- Tracked sales and inventory data to improve sales and optimize stock levels.\n- Assisted in receiving and storing deliveries.",
+      "highlights": []
+    },
+    {
+      "position": "Kitchen Hand & Waitstaff",
+      "url": "",
+      "startDate": "2024-01-10",
+      "endDate": "2024-06-10",
+      "summary": "- Assisted in food preparation such as chopping vegetables, plating dishes, and preparing simple meals.\n- Served guests their food and drink orders promptly.\n- Answered questions about the menu and provided recommendations.\n- Washed dishes, utensils, and kitchen equipment.\n- Set up and cleared tables.",
+      "highlights": []
+    },
+    {
+      "position": "Test Engineer",
+      "url": "",
+      "startDate": "2022-08-01",
+      "endDate": "2023-05-31",
+      "summary": "- Worked on manual and automation testing for Position Logic, a GPS tracking software.\n- Automated more than 50 test cases, significantly reducing testing time and allowing the team to focus more on critical feature testing.\n- Tools/Languages: Testrail, Jira, Selenium, Playwright, Postman, Allure Reports, Java, and Python.",
+      "highlights": []
+    },
+    {
+      "position": "Data Analyst",
+      "url": "",
+      "startDate": "2023-06-01",
+      "endDate": "2023-12-31",
+      "summary": "- Worked on data visualization and insights generation to drive business value.\n- Used Power BI for creating dashboards and analyzing trends.\n- Tools/Languages: Power BI (DAX and Power Query), Power Apps, Power Automate, Azure (Data Lake, Azure SQL Database, Synapse Analytics), Python for data visualization.",
+      "highlights": []
+    },
+    {
+      "position": "Verification and Validation Engineer",
+      "url": "",
+      "startDate": "2023-12-01",
+      "endDate": "2024-08-01",
+      "summary": "- Worked on testing a Class III medical device for Inovio Pharmaceuticals.\n- Developed and revised requirements and test cases as per client requests.\n- Received certification for Risk Management in Verification and Validation Process from TUV SUD South Asia Pvt. Ltd.",
+      "highlights": []
+    }
+  ],
+  "volunteer": [],
+  "education": [
+    {
+      "institution": "The University of Adelaide ",
+      "url": "",
+      "area": "",
+      "studyType": "Master of Artificial Intelligence and Machine Learning",
+      "startDate": "2025-02-02",
+      "endDate": "2026-11-01",
+      "score": "",
+      "courses": []
+    },
+    {
+      "institution": "Rajagiri Christu Jayanthi Public School ",
+      "url": "",
+      "area": "",
+      "studyType": "Year 10 Equivalent (India)",
+      "startDate": "2015-06-10",
+      "endDate": "2016-04-10",
+      "score": "95.00%",
+      "courses": []
+    },
+    {
+      "institution": "Rajagiri Christu Jayanthi Public School ",
+      "url": "",
+      "area": "",
+      "studyType": "Year 12 Equivalent (India)",
+      "startDate": "2017-06-06",
+      "endDate": "2018-04-10",
+      "score": "88.00%",
+      "courses": []
+    },
+    {
+      "institution": "Rajagiri School of Engineering and Technology",
+      "url": "",
+      "area": "",
+      "studyType": "Bachelor of Technology in Electronics and Communication",
+      "startDate": "2018-06-04",
+      "endDate": "2022-04-13",
+      "score": "74.70%",
+      "courses": []
+    }
+  ],
+  "awards": [],
+  "certificates": [
+    {
+      "name": "Responsible Service of Alcohol",
+      "date": "2025-02-28",
+      "url": "",
+      "issuer": "Express Online Training - Document Number: OL2811510"
+    },
+    {
+      "name": "Do Food Safely",
+      "date": "2025-03-15",
+      "url": "",
+      "issuer": "Department of Health, Victoria - Certificate #01064883"
+    }
+  ],
+  "publications": [],
+  "skills": [
+    {
+      "name": "Soft Skills",
+      "keywords": [
+        "Customer Service",
+        "Active Listening",
+        "Strong Verbal Communication",
+        "Friendly and Approachable",
+        "Positive Attitude",
+        "Conflict Resolution",
+        "Empathy and Patience",
+        "Helping Colleagues",
+        "Adaptability to Different Roles",
+        "Working Under Pressure",
+        "Problem-Solving",
+        "Teamwork and Collaboration",
+        "Time Management"
+      ]
+    },
+    {
+      "name": "Technical Skills",
+      "keywords": [
+        "Cash Handling & POS Operation",
+        "Inventory Management",
+        "Stock Receiving & Storage",
+        "Restocking Shelves",
+        "Product Knowledge",
+        "Merchandising & Display Setup",
+        "Loss Prevention Awareness",
+        "Conducting Stock Counts Regularly",
+        "Store Cleanliness & Safety",
+        "Compliance",
+        "Basic Sales & Upselling",
+        "Tracking Sales and Inventory Data",
+        "Dashboard Creation",
+        "Data Analytics",
+        "Data Cleaning & Preprocessing",
+        "Excel",
+        "Power BI",
+        "Power Platform",
+        "Java",
+        "Python",
+        "Selenium",
+        "SQL",
+        "AI Tools - Development & Prompting"
+      ]
+    }
+  ],
+  "languages": [],
+  "interests": [],
+  "references": [],
+  "projects": [],
+  "sideProjects": [],
+  "meta": {
+    "name": "",
+    "canonical": "",
+    "version": "",
+    "lastModified": "2025-03-10T18:28:18+10:30Z"
+  }
+}
