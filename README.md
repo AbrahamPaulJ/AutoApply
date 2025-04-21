@@ -1,12 +1,13 @@
 # AutoApply
 
-Automatically applies to **"Quick Apply"** postings on [seek.com.au](https://www.seek.com.au).
+Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://www.seek.com.au).
 
 ---
 
 ### 🚀 Features
-- Scrapes desired job listings from Seek.
-- Uses AI to generate a custom resume and cover letter and sends them via WhatsApp Web.
+- Scrapes desired job listings from Seek every 2 minutes.
+- Uses Gemini API to generate a custom resume and cover letter and sends them via WhatsApp Web (along with the link for the job).
+- You can then manually apply via the link (redirects to Seek mobile app). 
 
 ---
 
