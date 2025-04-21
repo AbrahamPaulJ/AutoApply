@@ -1,0 +1,47 @@
+2025/04/21-22:23:51.655 1ba4 Reusing MANIFEST C:\Users\abrah\OneDrive\Desktop\Projects\Automator\chrome_profile_serve\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/04/21-22:23:51.656 1ba4 Recovering log #48
+2025/04/21-22:23:51.732 1ba4 Reusing old log C:\Users\abrah\OneDrive\Desktop\Projects\Automator\chrome_profile_serve\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000048.log 
+2025/04/21-22:23:51.732 1ba4 Delete type=2 #47
+2025/04/21-22:23:51.733 1ba4 Delete type=2 #49
+2025/04/21-22:23:53.324 1ba4 Level-0 table #54: started
+2025/04/21-22:23:53.345 1ba4 Level-0 table #54: 757481 bytes OK
+2025/04/21-22:23:53.346 1ba4 Delete type=0 #48
+2025/04/21-22:23:53.347 1ba4 Manual compaction at level-0 from '\x00\x18\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x19\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/04/21-22:23:53.349 1ba4 Level-0 table #56: started
+2025/04/21-22:23:53.359 1ba4 Level-0 table #56: 249 bytes OK
+2025/04/21-22:23:53.360 1ba4 Delete type=0 #53
+2025/04/21-22:23:53.361 1ba4 Manual compaction at level-0 from '\x00\x19\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1a\x00\x00\x00' @ 0 : 0; will stop at '\x00\x19\x00\x00\x05' @ 254216 : 0
+2025/04/21-22:23:53.361 1ba4 Compacting 1@0 + 1@1 files
+2025/04/21-22:23:53.391 1ba4 Generated table #57@0: 29829 keys, 458308 bytes
+2025/04/21-22:23:53.391 1ba4 Compacted 1@0 + 1@1 files => 458308 bytes
+2025/04/21-22:23:53.391 1ba4 compacted to: files[ 0 1 2 0 0 0 0 ]
+2025/04/21-22:23:53.392 1ba4 Delete type=2 #56
+2025/04/21-22:23:53.392 1ba4 Manual compaction at level-0 from '\x00\x19\x00\x00\x05' @ 254216 : 0 .. '\x00\x1a\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/04/21-22:23:54.559 1bf8 Compacting 1@1 + 2@2 files
+2025/04/21-22:23:54.620 1bf8 Generated table #58@1: 44981 keys, 2197746 bytes
+2025/04/21-22:23:54.647 1bf8 Generated table #59@1: 23552 keys, 418455 bytes
+2025/04/21-22:23:54.647 1bf8 Compacted 1@1 + 2@2 files => 2616201 bytes
+2025/04/21-22:23:54.647 1bf8 compacted to: files[ 0 0 2 0 0 0 0 ]
+2025/04/21-22:23:54.648 1bf8 Delete type=2 #50
+2025/04/21-22:23:54.648 1bf8 Delete type=2 #51
+2025/04/21-22:23:54.648 1bf8 Delete type=2 #54
+2025/04/21-22:23:54.648 1bf8 Delete type=2 #57
+2025/04/21-22:24:08.420 1ba4 Level-0 table #61: started
+2025/04/21-22:24:08.442 1ba4 Level-0 table #61: 1030598 bytes OK
+2025/04/21-22:24:08.443 1ba4 Delete type=0 #55
+2025/04/21-22:24:08.448 1bf8 Compacting 1@1 + 2@2 files
+2025/04/21-22:24:08.489 1bf8 Generated table #62@1: 34652 keys, 2184489 bytes
+2025/04/21-22:24:08.530 1bf8 Generated table #63@1: 51096 keys, 924814 bytes
+2025/04/21-22:24:08.530 1bf8 Compacted 1@1 + 2@2 files => 3109303 bytes
+2025/04/21-22:24:08.531 1bf8 compacted to: files[ 0 0 2 0 0 0 0 ]
+2025/04/21-22:24:08.531 1bf8 Delete type=2 #58
+2025/04/21-22:24:08.531 1bf8 Delete type=2 #59
+2025/04/21-22:24:08.531 1bf8 Delete type=2 #61
+2025/04/21-22:24:14.159 1bf8 Level-0 table #65: started
+2025/04/21-22:24:14.183 1bf8 Level-0 table #65: 1025513 bytes OK
+2025/04/21-22:24:14.185 1bf8 Delete type=0 #60
+2025/04/21-22:24:15.168 1bf8 Compacting 1@1 + 2@2 files
+2025/04/21-22:24:15.221 1bf8 Generated table #66@1: 25237 keys, 2171409 bytes
+2025/04/21-22:24:15.281 1bf8 Generated table #67@1: 78145 keys, 1445900 bytes
+2025/04/21-22:24:15.281 1bf8 Compacted 1@1 + 2@2 files => 3617309 bytes
+2025/04/21-22:24:15.281 1bf8 compacted to: files[ 0 0 2 0 0 0 0 ]
