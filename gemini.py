@@ -8,7 +8,7 @@ import re
 def gen_cover_letter(raw_html: str) -> str:
 
     date = datetime.now().strftime("%d %B %Y").lstrip("0")  
-    resume = r"C:\Users\abrah\OneDrive\Desktop\Projects\Automator\clres.txt"
+    resume = "clres.txt"
     
     # Read the resume template
     with open(resume, 'r') as file:
@@ -48,11 +48,16 @@ def gen_cover_letter(raw_html: str) -> str:
 
 
 def generate_resume(job_title, advertiser_name, raw_html, browser):
-    # Define the resume file path
-    resume = r"C:\Users\abrah\OneDrive\Desktop\Projects\cover_letter_extension\resume.txt"
+    # Define base directories
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    jsoncv_dir = os.path.join(project_dir, 'jsoncv')
+    resume_txt_path = os.path.join(project_dir, 'resume.txt')
+    out_dir = os.path.join(project_dir, 'mycv')
+    data_filename = os.path.join(jsoncv_dir, 'cv.json')
     
+
     # Read the resume template
-    with open(resume, 'r') as file:
+    with open(resume_txt_path, 'r', encoding='utf-8') as file:
         json_resume = file.read()
 
     prompt = f'''{json_resume}\n This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job.
@@ -68,8 +73,6 @@ def generate_resume(job_title, advertiser_name, raw_html, browser):
     if not response or not response.text:
         return "Error generating resume - 500"
 
-    # Save the generated resume JSON to the DATA_FILENAME location
-    data_filename = r'C:\Users\abrah\Downloads\mycv\cv.json'
     try:
         cleaned_text = response.text.replace('```', '').replace('json', '').strip()
 
@@ -78,25 +81,23 @@ def generate_resume(job_title, advertiser_name, raw_html, browser):
         except json.JSONDecodeError as e:
             return f"Error decoding JSON: {str(e)}"
 
-        # Now save the parsed JSON to the file
         with open(data_filename, 'w', encoding='utf-8') as json_file:
             json.dump(resume_json, json_file, indent=4)
         print("Resume saved successfully.")
     except Exception as e:
         return f"Error writing to JSON file: {str(e)}"
 
-    # Run the build process with npm
-    out_dir = r"C:\Users\abrah\Downloads\mycv"
+    # Run the build process
     env = os.environ.copy()
     env["DATA_FILENAME"] = data_filename
     env["OUT_DIR"] = out_dir
 
     try:
         subprocess.run(
-            ['npm', 'run', 'build'], 
-            cwd=r'C:\Users\abrah\OneDrive\Desktop\Projects\cover_letter_extension\jsoncv', 
-            check=True, 
-            shell=True, 
+            ['npm', 'run', 'build'],
+            cwd=jsoncv_dir,
+            check=True,
+            shell=True,
             env=env
         )
         print("Build completed successfully.")
@@ -104,21 +105,14 @@ def generate_resume(job_title, advertiser_name, raw_html, browser):
         print(f"Error during build: {e}")
         return f"Error during build: {e}"
 
-    # Convert the generated HTML to PDF using Playwright (Reuse the page)
+    # Convert to PDF using Playwright
     try:
         html_file_path = os.path.join(out_dir, 'index.html')
         filename = f"{job_title[:10]}_{advertiser_name[:10]}.pdf"
-        filename = filename.replace(" ", "_")
-        filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
-
-        # Ensure the filename is safe (remove spaces or special characters if needed)
-        
-
-        # Construct the full file path
+        filename = re.sub(r'[\\/*?:"<>| ]', '_', filename)  # Sanitize filename
         pdf_file_path = os.path.join(out_dir, filename)
 
         res_page = browser.new_page()
-
         res_page.goto(f'file:///{html_file_path}')
         res_page.pdf(path=pdf_file_path)
         res_page.goto(f'file:///{pdf_file_path}')
@@ -169,19 +163,26 @@ def is_suitable(name,adv,jtype,loc,wtype,desc) -> bool:
     model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
     answer = response.text.strip().lower() if response.text else ""
+    print(f"is_suitable: {answer}")
     return not ("no" in answer)
 
 
 async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser):
-    resume = r"C:\Users\abrah\OneDrive\Desktop\Projects\cover_letter_extension\resume.txt"
+    # Define base paths
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    jsoncv_dir = os.path.join(project_dir, 'jsoncv')
+    resume_txt_path = os.path.join(project_dir, 'resume.txt')
+    data_filename = os.path.join(jsoncv_dir, 'mycv', 'cv.json')
+    out_dir = os.path.join(project_dir, 'mycv')
 
     # Read resume template
     try:
-        with open(resume, 'r') as file:
+        with open(resume_txt_path, 'r', encoding='utf-8') as file:
             json_resume = file.read()
     except Exception as e:
         return f"Error reading resume template: {str(e)}"
 
+    # Prompt to Gemini
     prompt = f'''{json_resume}\n This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job.
     You may change the summary, work, soft skills, and technical skills sections to include keywords relevant to the job description.
     You only need to include my work experience that is most relevant to the job. You can omit "certificates" if it is not at all relevant to the job. 
@@ -196,7 +197,6 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
         return "Error generating resume - 500"
 
     # Parse Gemini's response
-    data_filename = r'C:\Users\abrah\Downloads\mycv\cv.json'
     try:
         cleaned_text = response.text.replace('```', '').replace('json', '').strip()
 
@@ -205,6 +205,7 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
         except json.JSONDecodeError as e:
             return f"Error decoding JSON: {str(e)}"
 
+        os.makedirs(os.path.dirname(data_filename), exist_ok=True)
         with open(data_filename, 'w', encoding='utf-8') as json_file:
             json.dump(resume_json, json_file, indent=4)
         print("Resume saved successfully.")
@@ -212,7 +213,6 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
         return f"Error writing to JSON file: {str(e)}"
 
     # Run npm build
-    out_dir = r"C:\Users\abrah\Downloads\mycv"
     env = os.environ.copy()
     env["DATA_FILENAME"] = data_filename
     env["OUT_DIR"] = out_dir
@@ -220,7 +220,7 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
     try:
         subprocess.run(
             ['npm', 'run', 'build'],
-            cwd=r'C:\Users\abrah\OneDrive\Desktop\Projects\cover_letter_extension\jsoncv',
+            cwd=jsoncv_dir,
             check=True,
             shell=True,
             env=env
@@ -233,8 +233,7 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
     try:
         html_file_path = os.path.join(out_dir, 'index.html')
         filename = f"{job_title[:10]}_{advertiser_name[:10]}_{job_id}.pdf"
-        filename = filename.replace(" ", "_")
-        filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
+        filename = re.sub(r'[\\/*?:"<>| ]', '_', filename)  # Clean filename
         pdf_file_path = os.path.join(out_dir, filename)
 
         page = await browser.new_page()
@@ -250,7 +249,7 @@ async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser
 def agen_cover_letter(job_id, job_title, advertiser_name, raw_html):
 
     date = datetime.now().strftime("%d %B %Y").lstrip("0")  
-    resume = r"C:\Users\abrah\OneDrive\Desktop\Projects\Automator\clres.txt"
+    resume = "clres.txt"
     
     # Read the resume template
     with open(resume, 'r') as file:
@@ -288,7 +287,7 @@ def agen_cover_letter(job_id, job_title, advertiser_name, raw_html):
 
     response_text = response.text if response.text else "Error. NRFG"
 
-    out_dir = r"C:\Users\abrah\Downloads\mycl" 
+    out_dir = r"mycl" 
     os.makedirs(out_dir, exist_ok=True)  # ensure the folder exists
 
     filename = f"{job_title[:10]}_{advertiser_name[:10]}_{job_id}.txt"

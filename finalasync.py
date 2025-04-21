@@ -24,8 +24,9 @@ async def init_browser():
     if browser is None or not hasattr(browser, "new_context"):
         print("Initializing browser...")
         playwright = await async_playwright().start()
+        user_data_dir = os.path.abspath("chrome_profile")
         browser = await playwright.chromium.launch_persistent_context(
-            user_data_dir="C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\chrome_profile",
+            user_data_dir= user_data_dir,
             headless=False,
             args=[
                 '--disable-blink-features=AutomationControlled',
@@ -50,13 +51,12 @@ async def init_browser():
         page.set_default_timeout(10000)
         page.set_default_navigation_timeout(30000)
 
-
 @app.get("/generate_clcv_request", response_class=HTMLResponse)
 async def generate_clcv_request(request: Request, title: str, advertiser: str, job_id: str):
     return f"""
     <html>
         <head>
-            <title>Generate resume and cover letter.</title>
+            <title>Generate resume and cover letter</title>
         </head>
         <body>
             <h2>Generate for: {title} at {advertiser}</h2>
@@ -64,11 +64,14 @@ async def generate_clcv_request(request: Request, title: str, advertiser: str, j
                 <input type="hidden" name="title" value="{title}">
                 <input type="hidden" name="advertiser" value="{advertiser}">
                 <input type="hidden" name="job_id" value="{job_id}">
-                <button type="submit">Generate</button>
+                <button type="submit" style="padding: 20px 40px; font-size: 24px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Generate
+                </button>
             </form>
         </body>
     </html>
     """
+
 
 @app.get("/generate_clcv")
 async def generate_clcv(title: str, advertiser: str, job_id: str):
@@ -106,7 +109,7 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
             print("Resume wasn't generated")
             print(resume_pdf_path)
 
-        directory = "C:/Users/abrah/Downloads/mycv"
+        directory = "mycv"
         file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
         cl_file_path = os.path.abspath(os.path.join(directory, f"{cover_letter_path}"))
         print(f"PDF path: {file_path}")
@@ -116,7 +119,7 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
         up_btn_locator = wa.locator("//button[@title='Attach']")
         await up_btn_locator.wait_for(state='visible')
         await up_btn_locator.click()
-        file_input = wa.locator("//li[@tabindex='0']//input[@type='file' and @accept='*']")
+        file_input = wa.locator("input[type='file'][accept='*']").nth(0)
         await file_input.wait_for(state='attached')
 
 
@@ -146,6 +149,10 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
             except Exception as e:
                 print(f"Resume deletion skipped: {e}")
 
+            directory = "mycv"
+            file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
+            print(f"PDF path: {file_path}")
+
             resume_upload_radio = apage.locator('//input[@data-testid="resume-method-upload"]')
             await resume_upload_radio.wait_for(state="visible")
             await resume_upload_radio.click()
@@ -153,13 +160,13 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
             resume_upload_btn = apage.locator("//button[@id='resume-file-:r2:']")
             await resume_upload_btn.wait_for(state="visible")
 
-            directory = "C:/Users/abrah/Downloads/mycv"
-            file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
-            print(f"PDF path: {file_path}")
-
             file_input = apage.locator("//div[@data-testid='resumeFileInput']/input[@id='resume-fileFile']")
             await file_input.wait_for(state="attached")
             await file_input.set_input_files(file_path)
+
+            directory = "mycl"
+            file_path = os.path.abspath(os.path.join(directory, f"{cover_letter_path}"))
+            print(f"CL path: {file_path}")
 
             cover_letter_radio = apage.locator('//input[@type="radio" and @data-testid="coverLetter-method-upload"]')
             await cover_letter_radio.wait_for(state="attached")
@@ -168,13 +175,9 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
             cover_letter_upload_btn = apage.locator("//button[@id='coverLetter-file-:r5:']")
             await cover_letter_upload_btn.wait_for(state="visible")
 
-            directory = "C:/Users/abrah/Downloads/mycl"
-            file_path = os.path.abspath(os.path.join(directory, f"{cover_letter_path}"))
-            print(f"PDF path: {file_path}")
-
-            cl_file_input = apage.locator("//div[@data-testid='coverLetterFileInput']/input[@id='coverLetter-fileFile']")
-            await cl_file_input.wait_for(state="attached")
-            await cl_file_input.set_input_files(cl_file_path)
+            # cl_file_input = apage.locator("//div[@data-testid='coverLetterFileInput']/input[@id='coverLetter-fileFile']")
+            # await cl_file_input.wait_for(state="attached")
+            # await cl_file_input.set_input_files(cl_file_path)
 
             # cover_letter_textarea = apage.locator('//textarea[@data-testid="coverLetterTextInput"]')
             # await cover_letter_textarea.wait_for(state="visible")
@@ -231,12 +234,12 @@ async def process_job_listings(public_url):
     while True:  # Loop to go through all pages of job listings
 
         job_cards = page.locator('[id^="jobcard-"]').filter(
-            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}m'))
+            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}d'))
         )
         job_count = await job_cards.count()
         print(f"Found {job_count} job card(s) posted.")
 
-        for i in range(0, 1):
+        for i in range(0, 2):
             job = job_cards.nth(i) 
             job_id = await job.get_attribute('data-job-id')
             print(job_id)
@@ -294,14 +297,12 @@ async def process_job_listings(public_url):
                     summary = gen_summary(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
                     suitable = is_suitable(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
 
+                    await message_input.fill(summary)
+                    await send_icon.click()
+
                     if suitable:
                         print(f"{job_title} @ {advertiser_name} is a match.")
-                        
-                        # Generate the summary for the job application
-                        summary = gen_summary(job_title, advertiser_name, job_type, job_location, job_work_type, raw_html)
-                        await message_input.fill(summary)
-                        await send_icon.click()
-                        
+                         
                         params = {
                             'job_id': job_id,
                             'title': job_title,
