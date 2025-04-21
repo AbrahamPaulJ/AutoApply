@@ -49,7 +49,7 @@ def gen_cover_letter(raw_html: str) -> str:
 
 def generate_resume(job_title, advertiser_name, raw_html, browser):
     # Define base directories
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    project_dir = os.path.abspath(os.path.dirname(__file__))
     jsoncv_dir = os.path.join(project_dir, 'jsoncv')
     resume_txt_path = os.path.join(project_dir, 'resume.txt')
     out_dir = os.path.join(project_dir, 'mycv')
@@ -169,7 +169,7 @@ def is_suitable(name,adv,jtype,loc,wtype,desc) -> bool:
 
 async def agenerate_resume(job_id, job_title, advertiser_name, raw_html, browser):
     # Define base paths
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    project_dir = os.path.abspath(os.path.dirname(__file__))
     jsoncv_dir = os.path.join(project_dir, 'jsoncv')
     resume_txt_path = os.path.join(project_dir, 'resume.txt')
     data_filename = os.path.join(jsoncv_dir, 'mycv', 'cv.json')

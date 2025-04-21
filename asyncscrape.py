@@ -1,0 +1,184 @@
+
+from pyngrok import ngrok
+from playwright.async_api import async_playwright
+import asyncio
+import os
+import re
+import urllib.parse
+import threading
+from gemini import gen_summary
+
+
+playwright = None
+browser = None
+with open("ngrok_url.txt", "r") as f:
+    public_url = f.read().strip()
+print(f"App is accessible at {public_url}")  # Print the public URL
+
+async def init_browser():
+    global playwright, browser
+    
+    if browser is None or not hasattr(browser, "new_context"):
+        print("Initializing browser...")
+        playwright = await async_playwright().start()
+        user_data_dir = os.path.abspath("chrome_profile")
+        browser = await playwright.chromium.launch_persistent_context(
+            user_data_dir= user_data_dir,
+            headless=False,
+            args=[
+                '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-web-security',
+                '--disable-infobars',
+                "--start-maximized",
+            ],
+            no_viewport=True
+        )
+
+        wa = browser.pages[0]
+        await wa.goto("https://web.whatsapp.com/")
+        abraham = wa.locator("//span[@title='abraham_paul_jaison']")
+        await abraham.wait_for(state="visible")
+        await abraham.click()
+        
+        message_input = wa.locator("//div[@aria-label='Type a message']//p")
+        await message_input.wait_for(state="visible")
+
+
+async def process_job_listings(public_url):
+    global browser
+
+    wa = browser.pages[0]
+    abraham = wa.locator("//span[@title='abraham_paul_jaison']")
+    await abraham.wait_for(state="visible")
+    await abraham.click()
+    
+    message_input = wa.locator("//div[@aria-label='Type a message']//p")
+    await message_input.wait_for(state="visible")
+
+    page = await browser.new_page()
+    page.set_default_timeout(10000)
+    page.set_default_navigation_timeout(30000)
+
+    AA = "https://www.seek.com.au/jobs/in-All-Adelaide-SA?classification=6251%2C1200%2C1204%2C6163%2C1209%2C1212%2C6281%2C6092%2C6008%2C6043%2C6362%2C1223%2C1225&daterange=3&sortmode=ListedDate&subclassification=6226%2C6229%2C6143%2C6166%2C6168%2C6169%2C6171%2C6172%2C6095%2C6093%2C6097%2C6099%2C6101%2C6104%2C6105%2C6103%2C6106%2C6109%2C6108&worktype=243%2C245"
+    await page.goto(AA)
+
+    while True:  # Loop to go through all pages of job listings
+
+        job_cards = page.locator('[id^="jobcard-"]').filter(
+            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}d'))
+        )
+        job_count = await job_cards.count()
+        print(f"Found {job_count} job card(s) posted.")
+
+        for i in range(0, 3):
+            job = job_cards.nth(i) 
+            job_id = await job.get_attribute('data-job-id')
+            print(job_id)
+            job_link_locator = job.locator('a[data-automation="jobTitle"]')
+            try:
+                await job_link_locator.wait_for(state="visible")
+                await job_link_locator.click()
+
+                h1_locator = page.locator('//h1[@data-automation="job-detail-title"]/a')
+                await h1_locator.wait_for(state="visible")
+                job_title = await h1_locator.inner_text()
+                print("\n------------------------------------------------------------------------------------")
+                print(f"Retail Job found: {job_title}")
+
+                apply_btn_locator = page.locator('//a[@data-automation="job-detail-apply"]')
+                await apply_btn_locator.wait_for(state="visible")
+                apply_btn_text = (await apply_btn_locator.inner_text()).strip().lower()
+                print(f"Button text detected: {apply_btn_text}")
+
+                if "quick apply" in apply_btn_text:
+                    print("Quick Apply detected. Proceeding...")
+
+                    # Advertiser Name
+                    advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
+                    await advertiser_name_locator.wait_for(state='visible')
+                    advertiser_name = await advertiser_name_locator.inner_text()
+                    print(f"Advertiser name: {advertiser_name}")
+
+                    # Job Type
+                    job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
+                    await job_type_locator.wait_for(state='visible')
+                    job_type = await job_type_locator.inner_text()
+                    print(f"Job type: {job_type}")
+
+                    # Job Location
+                    job_location_locator = page.locator('span[data-automation="job-detail-location"]')
+                    await job_location_locator.wait_for(state='visible')
+                    job_location = await job_location_locator.inner_text()
+                    print(f"Job location: {job_location}")
+
+                    # Work Type
+                    job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
+                    await job_work_type_locator.wait_for(state='visible')
+                    job_work_type = await job_work_type_locator.inner_text()
+                    print(f"Work type: {job_work_type}")
+
+                    job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
+                    raw_html = await job_details_locator.inner_html()
+
+                    await message_input.fill(f"{job_title} @ {advertiser_name}") 
+                    send_icon = wa.locator("//span[@data-icon='send']")
+                    await send_icon.wait_for(state="visible")
+                    await send_icon.click()
+
+                    summary = gen_summary(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
+
+                    await message_input.fill(summary)
+                    await send_icon.click()
+
+                    #suitable = is_suitable(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
+                    #if suitable:
+                    #   print(f"{job_title} @ {advertiser_name} is a match.")
+                        
+                    params = {
+                        'job_id': job_id,
+                        'title': job_title,
+                        'advertiser': advertiser_name
+                    }
+                    encoded_params = urllib.parse.urlencode(params)
+                    apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
+
+                    # Print or use this URL wherever you need
+                    print(f"Apply via URL: {apply_url}")
+
+                    await message_input.fill(f"Apply Now: {apply_url}")
+                    await send_icon.click()
+                    print(f"Sent URL to Whatsapp: {apply_url}")      
+                    # else:
+                    #     await message_input.fill(f"{job_title} @ {advertiser_name} was not a match.") 
+                    #     await send_icon.click() 
+                    #     print(f"{job_title} @ {advertiser_name} is not a match.")   
+
+            except Exception as e:
+                print(f"Error: {e}. Skipping the page.")
+                import traceback
+                traceback.print_exc()
+
+        await page.wait_for_timeout(2000)
+        await browser.close()
+        break
+
+        # Check if the "Next" button exists
+        try:
+            next_button = page.locator("//span[contains(text(),'Next')]").first
+            await next_button.wait_for(state="visible", timeout=3000)
+            await next_button.click()
+            print("Navigating to next page...")
+            await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
+            await page.wait_for_timeout(5000)
+        except Exception:
+            print("No more pages available. Exiting loop.")
+            break
+
+async def start_job_processing():
+    await init_browser()
+    await process_job_listings(public_url)
+
+# threading.Thread(target=asyncio.run, args=(start_job_processing(),)).start()
+asyncio.run(start_job_processing())
+    

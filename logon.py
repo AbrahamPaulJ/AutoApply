@@ -3,7 +3,7 @@ import os
 import json
 
 # Define the user data directory path for WebKit
-user_data_dir = "C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\webkit_profile"
+user_data_dir = "C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\chrome_profile_serve"
 
 # Create the directory if it doesn't exist
 if not os.path.exists(user_data_dir):
@@ -11,10 +11,17 @@ if not os.path.exists(user_data_dir):
 
 with sync_playwright() as p:
     # Launch WebKit with persistent context
-    browser = p.webkit.launch_persistent_context(
+    browser = p.chromium.launch_persistent_context(
         user_data_dir=user_data_dir,
         headless=False,
-        no_viewport=True
+        no_viewport=True,
+        args=[
+            '--disable-blink-features=AutomationControlled',
+            '--no-sandbox',
+            '--disable-web-security',
+            '--disable-infobars',
+            "--start-maximized",
+        ],
     )
 
     # Open the first page (Seek login)
