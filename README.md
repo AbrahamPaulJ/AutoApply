@@ -6,9 +6,8 @@ Automatically applies to **"Quick Apply"** postings on [seek.com.au](https://www
 
 ### 🚀 Features
 - Scrapes desired job listings from Seek.
-- Uses AI to generate a custom resume and cover letter.
-- Sends applications via WhatsApp Web.
-  
+- Uses AI to generate a custom resume and cover letter and sends them via WhatsApp Web.
+
 ---
 
 ### 🛠 Requirements
