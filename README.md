@@ -12,8 +12,13 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 ---
 
 ### 🛠 Requirements
-- Python & Node.js
+- Python
+- Node.js (version 18 or higher)
 - Playwright with Chromium
 - Two `chrome_profile` folders  
   *(Both must be logged into Seek and WhatsApp Web)*
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
+
+### ⚙️ Installation
+- Install requirements.txt from root folder via pip
+- Go to 'jsoncv' folder and install the dependencies by running: npm run install
