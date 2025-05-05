@@ -31,6 +31,6 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 
 ### ▶️ Run
 - Run scraper_server.bat to start scraping in real time.
-- **OR**  
+**OR**  
 - Run automate.py to mass apply all listings in the last 1-3 days.
 
