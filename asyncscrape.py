@@ -5,7 +5,6 @@ import asyncio
 import os
 import re
 import urllib.parse
-import threading
 from gemini import gen_summary
 
 
@@ -66,98 +65,110 @@ async def process_job_listings(public_url):
     while True:  # Loop to go through all pages of job listings
 
         job_cards = page.locator('[id^="jobcard-"]').filter(
-            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}d'))
+            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}h'))
         )
         job_count = await job_cards.count()
         print(f"Found {job_count} job card(s) posted.")
 
+        PROCESSED_JOBS_FILE = "job_ids.txt"
+        if os.path.exists(PROCESSED_JOBS_FILE):
+            with open(PROCESSED_JOBS_FILE, "r") as f:
+                processed_ids = set(line.strip() for line in f)
+        else:
+            processed_ids = set()
+
         for i in range(0, 3):
             job = job_cards.nth(i) 
             job_id = await job.get_attribute('data-job-id')
-            print(job_id)
-            job_link_locator = job.locator('a[data-automation="jobTitle"]')
-            try:
-                await job_link_locator.wait_for(state="visible")
-                await job_link_locator.click()
+            if job_id not in processed_ids:
+                job_link_locator = job.locator('a[data-automation="jobTitle"]')
+                try:
+                    await job_link_locator.wait_for(state="visible")
+                    await job_link_locator.click()
 
-                h1_locator = page.locator('//h1[@data-automation="job-detail-title"]/a')
-                await h1_locator.wait_for(state="visible")
-                job_title = await h1_locator.inner_text()
-                print("\n------------------------------------------------------------------------------------")
-                print(f"Retail Job found: {job_title}")
+                    h1_locator = page.locator('//h1[@data-automation="job-detail-title"]/a')
+                    await h1_locator.wait_for(state="visible")
+                    job_title = await h1_locator.inner_text()
+                    print("\n------------------------------------------------------------------------------------")
+                    print(f"Retail Job found: {job_title}")
 
-                apply_btn_locator = page.locator('//a[@data-automation="job-detail-apply"]')
-                await apply_btn_locator.wait_for(state="visible")
-                apply_btn_text = (await apply_btn_locator.inner_text()).strip().lower()
-                print(f"Button text detected: {apply_btn_text}")
+                    apply_btn_locator = page.locator('//a[@data-automation="job-detail-apply"]')
+                    await apply_btn_locator.wait_for(state="visible")
+                    apply_btn_text = (await apply_btn_locator.inner_text()).strip().lower()
+                    print(f"Button text detected: {apply_btn_text}")
 
-                if "quick apply" in apply_btn_text:
-                    print("Quick Apply detected. Proceeding...")
+                    if "quick apply" in apply_btn_text:
+                        print("Quick Apply detected. Proceeding...")
 
-                    # Advertiser Name
-                    advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
-                    await advertiser_name_locator.wait_for(state='visible')
-                    advertiser_name = await advertiser_name_locator.inner_text()
-                    print(f"Advertiser name: {advertiser_name}")
+                        # Advertiser Name
+                        advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
+                        await advertiser_name_locator.wait_for(state='visible')
+                        advertiser_name = await advertiser_name_locator.inner_text()
+                        print(f"Advertiser name: {advertiser_name}")
 
-                    # Job Type
-                    job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
-                    await job_type_locator.wait_for(state='visible')
-                    job_type = await job_type_locator.inner_text()
-                    print(f"Job type: {job_type}")
+                        # Job Type
+                        job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
+                        await job_type_locator.wait_for(state='visible')
+                        job_type = await job_type_locator.inner_text()
+                        print(f"Job type: {job_type}")
 
-                    # Job Location
-                    job_location_locator = page.locator('span[data-automation="job-detail-location"]')
-                    await job_location_locator.wait_for(state='visible')
-                    job_location = await job_location_locator.inner_text()
-                    print(f"Job location: {job_location}")
+                        # Job Location
+                        job_location_locator = page.locator('span[data-automation="job-detail-location"]')
+                        await job_location_locator.wait_for(state='visible')
+                        job_location = await job_location_locator.inner_text()
+                        print(f"Job location: {job_location}")
 
-                    # Work Type
-                    job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
-                    await job_work_type_locator.wait_for(state='visible')
-                    job_work_type = await job_work_type_locator.inner_text()
-                    print(f"Work type: {job_work_type}")
+                        # Work Type
+                        job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
+                        await job_work_type_locator.wait_for(state='visible')
+                        job_work_type = await job_work_type_locator.inner_text()
+                        print(f"Work type: {job_work_type}")
 
-                    job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
-                    raw_html = await job_details_locator.inner_html()
+                        job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
+                        raw_html = await job_details_locator.inner_html()
 
-                    await message_input.fill(f"{job_title} @ {advertiser_name}") 
-                    send_icon = wa.locator("//span[@data-icon='send']")
-                    await send_icon.wait_for(state="visible")
-                    await send_icon.click()
+                        await message_input.fill(f"{job_title} @ {advertiser_name}") 
+                        send_icon = wa.locator("//span[@data-icon='send']")
+                        await send_icon.wait_for(state="visible")
+                        await send_icon.click()
 
-                    summary = gen_summary(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
+                        summary = gen_summary(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
 
-                    await message_input.fill(summary)
-                    await send_icon.click()
+                        await message_input.fill(summary)
+                        await send_icon.click()
 
-                    #suitable = is_suitable(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
-                    #if suitable:
-                    #   print(f"{job_title} @ {advertiser_name} is a match.")
-                        
-                    params = {
-                        'job_id': job_id,
-                        'title': job_title,
-                        'advertiser': advertiser_name
-                    }
-                    encoded_params = urllib.parse.urlencode(params)
-                    apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
+                        #suitable = is_suitable(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
+                        #if suitable:
+                        #   print(f"{job_title} @ {advertiser_name} is a match.")
+                            
+                        params = {
+                            'job_id': job_id,
+                            'title': job_title,
+                            'advertiser': advertiser_name
+                        }
+                        encoded_params = urllib.parse.urlencode(params)
+                        apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
 
-                    # Print or use this URL wherever you need
-                    print(f"Apply via URL: {apply_url}")
+                        # Print or use this URL wherever you need
+                        print(f"Apply via URL: {apply_url}")
 
-                    await message_input.fill(f"Apply Now: {apply_url}")
-                    await send_icon.click()
-                    print(f"Sent URL to Whatsapp: {apply_url}")      
-                    # else:
-                    #     await message_input.fill(f"{job_title} @ {advertiser_name} was not a match.") 
-                    #     await send_icon.click() 
-                    #     print(f"{job_title} @ {advertiser_name} is not a match.")   
+                        await message_input.fill(f"Generate resume and cover letter: {apply_url}")
+                        await send_icon.click()
+                        print(f"Sent URL to Whatsapp: {apply_url}")    
+                        with open(PROCESSED_JOBS_FILE, "a") as f:
+                            f.write(f"{job_id}\n")
+                        processed_ids.add(job_id)  
+                        # else:
+                        #     await message_input.fill(f"{job_title} @ {advertiser_name} was not a match.") 
+                        #     await send_icon.click() 
+                        #     print(f"{job_title} @ {advertiser_name} is not a match.")   
 
-            except Exception as e:
-                print(f"Error: {e}. Skipping the page.")
-                import traceback
-                traceback.print_exc()
+                except Exception as e:
+                    print(f"Error: {e}. Skipping the page.")
+                    import traceback
+                    traceback.print_exc()
+            else:
+                print(f"Job ID {job_id} is already processed.")
 
         await page.wait_for_timeout(2000)
         await browser.close()

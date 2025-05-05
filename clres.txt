@@ -19,6 +19,14 @@
   },
   "work": [
     {
+      "position": "Room Attendant",
+      "url": "",
+      "startDate": "2025-03-27",
+      "endDate": "",
+      "summary": "- Performed general cleaning duties including vacuuming, sweeping and mopping.\n- Changed linen and made beds.\n- Cleaned showers, baths, sinks and kitchens.\n- Removed used guest amenities and rubbish, and replenished supplies.\n- Worked at fast pace while maintaining high standards of cleanliness.",
+      "highlights": []
+    },
+    {
       "position": "Sales Associate",
       "url": "",
       "startDate": "2024-08-07",
@@ -43,63 +51,20 @@
       "highlights": []
     },
     {
+      "position": "Junior Bookkeeper",
+      "url": "",
+      "startDate": "2023-12-01",
+      "endDate": "2024-08-01",
+      "summary": "- Gained hands-on experience with accounts software, including creating invoices, managing bills, and performing bank reconciliations.\n- Reviewed key financial reports and practiced inventory setup and tracking.\n- Maintained accurate customer/supplier records to support financial decision-making.",
+      "highlights": []
+    },
+    {
       "position": "Data Analyst",
       "url": "",
       "startDate": "2023-06-01",
       "endDate": "2023-12-31",
       "summary": "- Worked on data visualization and insights generation to drive business value.\n- Used Power BI for creating dashboards and analyzing trends.\n- Tools/Languages: Power BI (DAX and Power Query), Power Apps, Power Automate, Azure (Data Lake, Azure SQL Database, Synapse Analytics), Python for data visualization.",
       "highlights": []
-    },
-    {
-      "position": "Verification and Validation Engineer",
-      "url": "",
-      "startDate": "2023-12-01",
-      "endDate": "2024-08-01",
-      "summary": "- Worked on testing a Class III medical device for Inovio Pharmaceuticals.\n- Developed and revised requirements and test cases as per client requests.\n- Received certification for Risk Management in Verification and Validation Process from TUV SUD South Asia Pvt. Ltd.",
-      "highlights": []
-    }
-  ],
-  "volunteer": [],
-  "education": [
-    {
-      "institution": "The University of Adelaide ",
-      "url": "",
-      "area": "",
-      "studyType": "Master of Artificial Intelligence and Machine Learning",
-      "startDate": "2025-02-02",
-      "endDate": "2026-11-01",
-      "score": "",
-      "courses": []
-    },
-    {
-      "institution": "Rajagiri Christu Jayanthi Public School ",
-      "url": "",
-      "area": "",
-      "studyType": "Year 10 Equivalent (India)",
-      "startDate": "2015-06-10",
-      "endDate": "2016-04-10",
-      "score": "95.00%",
-      "courses": []
-    },
-    {
-      "institution": "Rajagiri Christu Jayanthi Public School ",
-      "url": "",
-      "area": "",
-      "studyType": "Year 12 Equivalent (India)",
-      "startDate": "2017-06-06",
-      "endDate": "2018-04-10",
-      "score": "88.00%",
-      "courses": []
-    },
-    {
-      "institution": "Rajagiri School of Engineering and Technology",
-      "url": "",
-      "area": "",
-      "studyType": "Bachelor of Technology in Electronics and Communication",
-      "startDate": "2018-06-04",
-      "endDate": "2022-04-13",
-      "score": "74.70%",
-      "courses": []
     }
   ],
   "awards": [],
@@ -133,6 +98,7 @@
         "Adaptability to Different Roles",
         "Working Under Pressure",
         "Problem-Solving",
+        "Numerical Proficiency",
         "Teamwork and Collaboration",
         "Time Management"
       ]
@@ -140,6 +106,13 @@
     {
       "name": "Technical Skills",
       "keywords": [
+        "Xero",
+        "MyOB",
+        "Bank Reconciliation",
+        "Accounts Payable & Receivable",
+        "General Ledger Management",
+        "Invoice Processing",
+        "Payroll Processing",
         "Cash Handling & POS Operation",
         "Inventory Management",
         "Stock Receiving & Storage",

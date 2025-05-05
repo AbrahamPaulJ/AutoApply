@@ -9,6 +9,10 @@ from gemini import  agen_cover_letter, agenerate_resume
 playwright = None
 browser = None
 
+with open("job_ids.txt", "w") as f:
+    f.truncate(0)
+print("Cleared job_ids.txt")
+
 public_url = ngrok.connect(5000).public_url  # Start ngrok tunnel and get public URL
 with open("ngrok_url.txt", "w") as f:
     f.write(public_url)

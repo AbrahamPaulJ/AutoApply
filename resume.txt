@@ -19,6 +19,17 @@
   },
 "work": [
   {
+    "name": "AHS Hospitality, Holiday Inn Express Adelaide City Centre", 
+    "location": "Holiday Inn Express Adelaide City Centre",
+    "description": "",
+    "position": "Room Attendant",
+    "url": "",
+    "startDate": "2025-03-27", 
+    "endDate": "",
+    "summary": "- Performed general cleaning duties including vacuuming, sweeping and mopping.\n- Changed linen and made beds.\n- Cleaned showers, baths, sinks and kitchens.\n- Removed used guest amenities and rubbish, and replenished supplies.\n- Worked at fast pace while maintaining high standards of cleanliness.",
+    "highlights": []
+  },
+  {ss
     "name": "HomeStyle Essentials",
     "location": "Kerala, India",
     "description": "",
@@ -55,26 +66,26 @@
     "name": "Gadgeon Smart Systems",
     "location": "Kerala, India",
     "description": "",
-    "position": "Data Analyst",
+    "position": "Junior Bookkeeper",
     "url": "",
-    "startDate": "2023-06-01",
-    "endDate": "2023-12-31",
-    "summary": "- Worked on data visualization and insights generation to drive business value.\n- Used Power BI for creating dashboards and analyzing trends.\n- Tools/Languages: Power BI (DAX and Power Query), Power Apps, Power Automate, Azure (Data Lake, Azure SQL Database, Synapse Analytics), Python for data visualization.",
+    "startDate": "2023-12-01",
+    "endDate": "2024-08-01",
+    "summary": "- Gained hands-on experience with accounts software, including creating invoices, managing bills, and performing bank reconciliations.\n- Reviewed key financial reports and practiced inventory setup and tracking.\n- Maintained accurate customer/supplier records to support financial decision-making.",
     "highlights": []
   },
   {
     "name": "Gadgeon Smart Systems",
     "location": "Kerala, India",
     "description": "",
-    "position": "Verification and Validation Engineer",
+    "position": "Data Analyst",
     "url": "",
-    "startDate": "2023-12-01",
-    "endDate": "2024-08-01",
-    "summary": "- Worked on testing a Class III medical device for Inovio Pharmaceuticals.\n- Developed and revised requirements and test cases as per client requests.\n- Received certification for Risk Management in Verification and Validation Process from TUV SUD South Asia Pvt. Ltd.",
+    "startDate": "2023-06-01",
+    "endDate": "2023-12-31",
+    "summary": "- Worked on data visualization and insights generation to drive business value.\n- Used Power BI for creating dashboards and analyzing trends.\n- Tools/Languages: Power BI (DAX and Power Query), Power Apps, Power Automate, Azure (Data Lake, Azure SQL Database, Synapse Analytics), Python for data visualization.",
     "highlights": []
   }
 ],
-  "volunteer": [],
+ "volunteer": [],
   "education": [
         {
       "institution": "The University of Adelaide ",
@@ -131,7 +142,6 @@
       "url": "",
       "issuer": "Department of Health, Victoria - Certificate #01064883"
     }
-
   ],
   "publications": [],
 "skills": [
@@ -149,6 +159,7 @@
             "Adaptability to Different Roles",
             "Working Under Pressure",
             "Problem-Solving",
+            "Numerical Proficiency",
             "Teamwork and Collaboration",
             "Time Management"
         ]
@@ -156,6 +167,13 @@
     {
         "name": "Technical Skills",
         "keywords": [
+            "Xero",
+            "MyOB",
+            "Bank Reconciliation",
+            "Accounts Payable & Receivable",
+            "General Ledger Management",
+            "Invoice Processing",
+            "Payroll Processing",
             "Cash Handling & POS Operation",
             "Inventory Management",
             "Stock Receiving & Storage",
