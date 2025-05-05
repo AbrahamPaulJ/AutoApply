@@ -21,9 +21,13 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
 - A Whatsapp number to receive the job listings in real time.
 
+---
+
 ### ⚙️ Installation
 - Install requirements.txt from root folder via pip
 - Go to 'jsoncv' folder and install the dependencies by running: npm run install
+
+---
 
 ### ▶️ Run
 - Run scraper_server.bat to start scraping in real time. 
