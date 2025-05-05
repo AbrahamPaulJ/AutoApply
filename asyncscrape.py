@@ -175,16 +175,16 @@ async def process_job_listings(public_url):
         break
 
         # Check if the "Next" button exists
-        try:
-            next_button = page.locator("//span[contains(text(),'Next')]").first
-            await next_button.wait_for(state="visible", timeout=3000)
-            await next_button.click()
-            print("Navigating to next page...")
-            await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
-            await page.wait_for_timeout(5000)
-        except Exception:
-            print("No more pages available. Exiting loop.")
-            break
+        # try:
+        #     next_button = page.locator("//span[contains(text(),'Next')]").first
+        #     await next_button.wait_for(state="visible", timeout=3000)
+        #     await next_button.click()
+        #     print("Navigating to next page...")
+        #     await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
+        #     await page.wait_for_timeout(5000)
+        # except Exception:
+        #     print("No more pages available. Exiting loop.")
+        #     break
 
 async def start_job_processing():
     await init_browser()
