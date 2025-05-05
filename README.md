@@ -16,4 +16,4 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 - Playwright with Chromium
 - Two `chrome_profile` folders  
   *(Both must be logged into Seek and WhatsApp Web)*
-- A Gemini API Key
+- A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
