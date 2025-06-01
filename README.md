@@ -20,7 +20,7 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
   *(Both must be logged into Seek)*
 - ngrok auth Key. Get one for free at https://ngrok.com/docs/api/resources/api-keys/
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
-- A Telegram number to receive the job listings in real time.
+- A Telegram number to receive the applications in real time.
 
 ---
 
