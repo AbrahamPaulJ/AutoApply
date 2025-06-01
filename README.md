@@ -1,13 +1,14 @@
 # AutoApply
 
-Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://www.seek.com.au).
+Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.com.au](https://www.seek.com.au). 
 
 ---
 
 ### 🚀 Features
 - Scrapes desired job listings from Seek every 2 minutes.
-- Uses Gemini API to generate a custom resume and cover letter and sends them via WhatsApp Web (along with the link for the job).
-- You can then manually apply via the link (redirects to Seek mobile app). 
+- Use your desired filters for the jobs. Gemini API matches your details to the job listing to decide whether to complete the application.
+- If suitable, Gemini API generates a custom resume and cover letter and applies for the job. 
+- The suitability and application status is sent via Telegram to the user in real time. 
 
 ---
 
@@ -16,10 +17,10 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 - Node.js (version 18 or higher)
 - Playwright with Chromium
 - Two `chrome_profile` folders  
-  *(Both must be logged into Seek and WhatsApp Web)*
+  *(Both must be logged into Seek)*
 - ngrok auth Key. Get one for free at https://ngrok.com/docs/api/resources/api-keys/
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
-- A Whatsapp number to receive the job listings in real time.
+- A Telegram number to receive the job listings in real time.
 
 ---
 
@@ -32,4 +33,4 @@ Real time scraping of **"Quick Apply"** job listings on [seek.com.au](https://ww
 ### ▶️ Run
 - Run `scraper_server.bat` to start scraping in real time.  
 **or**  
-- Run `automate.py` to mass apply all listings from the last 1–3 days.
+- Run `asyncscrape.py` in UI mode to mass apply all listings from the last 3 days.
