@@ -10,7 +10,5 @@ chrome_profile_serve/
 ignored/
 tests/
 legacy/
-resume.txt
-clres.txt
 analyse.py
 README.md
