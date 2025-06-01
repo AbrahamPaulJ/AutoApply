@@ -6,14 +6,33 @@ import os
 from gemini import  agen_cover_letter, agenerate_resume
 
 
+user = 'abraham_paul_jaison'
+
 playwright = None
 browser = None
 
-with open("job_ids.txt", "w") as f:
-    f.truncate(0)
-print("Cleared job_ids.txt")
+base_dir = os.path.join("Users")  # adjust path if needed
+file_to_clear = "job_ids.txt"
 
-public_url = ngrok.connect(5000).public_url  # Start ngrok tunnel and get public URL
+for user_folder in os.listdir(base_dir):
+    user_path = os.path.join(base_dir, user_folder)
+    if os.path.isdir(user_path):
+        job_ids = os.path.join(user_path, file_to_clear)
+        if os.path.exists(job_ids):
+            with open(job_ids, "w") as f:
+                f.truncate(0)
+            print(f"Cleared: {job_ids}")
+        else:
+            print(f"Not found: {job_ids}")
+
+tunnel = ngrok.connect(
+    addr=5000,
+    domain="correct-imp-sacred.ngrok-free.app"
+)
+
+public_url = tunnel.public_url  # Correct: Gets full https URL
+
+
 with open("ngrok_url.txt", "w") as f:
     f.write(public_url)
 print(f"App is accessible at {public_url}")  # Print the public URL
@@ -63,6 +82,13 @@ async def generate_clcv_request(request: Request, title: str, advertiser: str, j
                 <input type="hidden" name="title" value="{title}">
                 <input type="hidden" name="advertiser" value="{advertiser}">
                 <input type="hidden" name="job_id" value="{job_id}">
+                
+                <label for="cl_extra">Cover Letter - Additional Info:</label><br>
+                <textarea name="cl_extra" rows="4" cols="50" placeholder="Additional context for cover letter..."></textarea><br><br>
+
+                <label for="resume_extra">Resume - Additional Info:</label><br>
+                <textarea name="resume_extra" rows="4" cols="50" placeholder="Additional context for resume..."></textarea><br><br>
+
                 <button type="submit" style="padding: 20px 40px; font-size: 24px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;">
                     Generate
                 </button>
@@ -71,9 +97,8 @@ async def generate_clcv_request(request: Request, title: str, advertiser: str, j
     </html>
     """
 
-
 @app.get("/generate_clcv")
-async def generate_clcv(title: str, advertiser: str, job_id: str):
+async def generate_clcv(title: str, advertiser: str, job_id: str,  cl_extra: str = "", resume_extra: str = ""):
     global browser
     await init_browser()
 
@@ -102,8 +127,8 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
         job_details_locator = apage.locator('div[data-automation="jobAdDetails"]')
         raw_html = await job_details_locator.inner_html()
 
-        cover_letter, cover_letter_path = agen_cover_letter(title, advertiser, raw_html, raw_html)
-        resume_pdf_path = await agenerate_resume(job_id, title, advertiser, raw_html, browser)
+        cover_letter, cover_letter_path = agen_cover_letter(job_id, title, advertiser, raw_html, cl_extra)
+        resume_pdf_path = await agenerate_resume(job_id, title, advertiser, raw_html, resume_extra, browser)
         if "error" in resume_pdf_path.lower():
             print("Resume wasn't generated")
             print(resume_pdf_path)
@@ -112,7 +137,7 @@ async def generate_clcv(title: str, advertiser: str, job_id: str):
         file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
         cl_file_path = os.path.abspath(os.path.join(directory, f"{cover_letter_path}"))
         print(f"PDF path: {file_path}")
-        print(f"CL path: {cover_letter_path}")
+        print(f"CL path: {cl_file_path}")
 
         await wa.bring_to_front()
         up_btn_locator = wa.locator("//button[@title='Attach']")

@@ -1,7 +1,15 @@
 import json
+import os
 
-# Load resume data from resume.txt
-with open("resume.txt", "r", encoding="utf-8") as f:
+user = "abraham"  # Replace with actual username or input()
+
+# Define paths relative to the user folder
+folder_path = os.path.join("Users", user)
+resume_path = os.path.join(folder_path, "resume.txt")
+clres_path = os.path.join(folder_path, "clres.txt")
+
+# Load resume data
+with open(resume_path, "r", encoding="utf-8") as f:
     resume = json.load(f)
 
 # Fields to remove from each work entry
@@ -12,8 +20,8 @@ for job in resume.get("work", []):
     for field in fields_to_remove:
         job.pop(field, None)
 
-# Write the cleaned data to clres.txt
-with open("clres.txt", "w", encoding="utf-8") as f:
+# Write the cleaned data
+with open(clres_path, "w", encoding="utf-8") as f:
     json.dump(resume, f, indent=2, ensure_ascii=False)
 
-print("clres.txt created successfully with 'name', 'location', and 'description' removed from work entries.")
+print(f"{clres_path} created successfully with 'name', 'location', and 'description' removed from work entries.")

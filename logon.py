@@ -1,16 +1,19 @@
 from playwright.sync_api import sync_playwright
 import os
-import json
+import shutil
 
-# Define the user data directory path for WebKit
-user_data_dir = "C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\chrome_profile_serve"
+user = "static"
+
+# Define the user data directories
+user_data_dir = f"C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\Users\\{user}\\chrome_profile"
+backup_dir = f"C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\Users\\{user}\\chrome_profile_serve"
 
 # Create the directory if it doesn't exist
 if not os.path.exists(user_data_dir):
     os.makedirs(user_data_dir)
 
 with sync_playwright() as p:
-    # Launch WebKit with persistent context
+    # Launch Chromiums
     browser = p.chromium.launch_persistent_context(
         user_data_dir=user_data_dir,
         headless=False,
@@ -28,10 +31,6 @@ with sync_playwright() as p:
     page = browser.new_page()
     page.goto("https://login.seek.com/")
 
-    # Open the second page (WhatsApp Web)
-    page2 = browser.new_page()
-    page2.goto("https://web.whatsapp.com/")
-
     # Wait for manual login
     input("Log in manually and then press Enter to continue...")
 
@@ -42,4 +41,12 @@ with sync_playwright() as p:
 
     # Close the browser after actions
     browser.close()
+
+try:
+    if os.path.exists(backup_dir):
+        shutil.rmtree(backup_dir)  # Remove old backup
+    shutil.copytree(user_data_dir, backup_dir)
+    print(f"Copied user data from '{user_data_dir}' to '{backup_dir}'.")
+except Exception as e:
+    print(f"Error copying profile: {e}")
 

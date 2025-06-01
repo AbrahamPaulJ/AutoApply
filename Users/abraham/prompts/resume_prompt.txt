@@ -1,0 +1,7 @@
+{json_resume}
+This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job (try to include AHS Hospitality whenever possible).  
+You may change the summary, work, soft skills, and technical skills sections to include keywords relevant to the job description. Do **not** mention the job title or employer name explicitly in the summary (avoid phrases like "seeking a role at [company]" or job-specific tailoring).
+You only need to include my work experience that is most relevant to the job. For administration jobs please include my IT work experience. You can omit "certificates" if it is not at all relevant to the job. 
+Your reply must have only the json output.
+The job title is {job_title}, and the job description is:
+{raw_html}

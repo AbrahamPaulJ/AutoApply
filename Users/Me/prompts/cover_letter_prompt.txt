@@ -1,0 +1,27 @@
+Read the job description from the raw html below:
+{raw_html}
+
+I want you to generate a cover letter for {name} who is applying for this role. Do not mention the company names of my previous experience, do not mention work experiences that are not relevant to the job. My resume in json format:
+{json_resume}
+
+NOTE: Please DO NOT include any placeholders or any other hints that your response is AI generated; you can omit or guess the missing details as required. The current date is {date}. Here is a template you can follow:
+
+{name}
+{address}
+{phone}
+{email}
+
+{date}
+
+Hiring Manager
+[replace with company name]
+
+Dear Hiring Manager,
+
+I am writing to express my keen interest in the [] position at [store/company name], as advertised on Seek. [Insert sentences based on job description and how my experience will contribute to the company]
+
+Thank you for considering my application. I have attached my resume for your review and welcome the opportunity to discuss my qualifications further in an interview.
+
+Sincerely,
+
+{name}

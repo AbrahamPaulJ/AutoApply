@@ -1,12 +1,48 @@
-
-from pyngrok import ngrok
+from utils import get_user_field
 from playwright.async_api import async_playwright
 import asyncio
 import os
 import re
-import urllib.parse
-from gemini import gen_summary
+import sys
+import requests
+from gemini import gen_summary, is_suitable, agen_cover_letter, agenerate_resume, get_question_actions
 
+from utils import clear_job_ids
+
+# Default mode
+#clear_job_ids()
+pagination = False
+looprange = 5
+timeframe = re.compile(r'(5|[1-5]\d|60)m')  # 5–60 mins
+ui_mode = 1
+
+if ui_mode:
+    pagination = True
+    timeframe = re.compile(r'.*')
+
+user = 'abraham'
+CHAT_ID = get_user_field(user, "chat_id")
+
+if len(sys.argv) > 1:
+    looprange = int(sys.argv[1])
+if len(sys.argv) > 2:
+    timeframe_pattern = sys.argv[2]
+if len(sys.argv) > 3:
+    user = sys.argv[3]
+
+# Telegram Bot Configuration
+BOT_TOKEN = '7565937945:AAGEoHuAhoiNU-MAEXHQc6bF_8lr14_LgzA'
+
+# Function to send message via Telegram API
+def send_telegram_message(message):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        'chat_id': CHAT_ID,
+        'text': message
+    }
+    response = requests.post(url, data=payload)
+    if response.status_code != 200:
+        print(f"Failed to send Telegram message: {response.text}")
 
 playwright = None
 browser = None
@@ -20,7 +56,8 @@ async def init_browser():
     if browser is None or not hasattr(browser, "new_context"):
         print("Initializing browser...")
         playwright = await async_playwright().start()
-        user_data_dir = os.path.abspath("chrome_profile")
+        
+        user_data_dir = os.path.abspath(os.path.join("Users", user, "chrome_profile"))
         browser = await playwright.chromium.launch_persistent_context(
             user_data_dir= user_data_dir,
             headless=False,
@@ -34,51 +71,36 @@ async def init_browser():
             no_viewport=True
         )
 
-        wa = browser.pages[0]
-        await wa.goto("https://web.whatsapp.com/")
-        abraham = wa.locator("//span[@title='abraham_paul_jaison']")
-        await abraham.wait_for(state="visible")
-        await abraham.click()
-        
-        message_input = wa.locator("//div[@aria-label='Type a message']//p")
-        await message_input.wait_for(state="visible")
-
-
 async def process_job_listings(public_url):
     global browser
 
-    wa = browser.pages[0]
-    abraham = wa.locator("//span[@title='abraham_paul_jaison']")
-    await abraham.wait_for(state="visible")
-    await abraham.click()
-    
-    message_input = wa.locator("//div[@aria-label='Type a message']//p")
-    await message_input.wait_for(state="visible")
-
     page = await browser.new_page()
-    page.set_default_timeout(10000)
-    page.set_default_navigation_timeout(30000)
+    await browser.pages[0].close()
+    page.set_default_timeout(5000)
+    page.set_default_navigation_timeout(5000)
 
-    AA = "https://www.seek.com.au/jobs/in-All-Adelaide-SA?classification=6251%2C1200%2C1204%2C6163%2C1209%2C1212%2C6281%2C6092%2C6008%2C6043%2C6362%2C1223%2C1225&daterange=3&sortmode=ListedDate&subclassification=6226%2C6229%2C6143%2C6166%2C6168%2C6169%2C6171%2C6172%2C6095%2C6093%2C6097%2C6099%2C6101%2C6104%2C6105%2C6103%2C6106%2C6109%2C6108&worktype=243%2C245"
+    file_path = os.path.join("Users", user, "filter.txt")
+    with open(file_path, "r") as f:
+        AA = f.read().strip()
     await page.goto(AA)
 
     while True:  # Loop to go through all pages of job listings
-
+        
         job_cards = page.locator('[id^="jobcard-"]').filter(
-            has=page.locator('span[data-automation="jobListingDate"]', has_text=re.compile(r'\d{1,2}h'))
+            has=page.locator('span[data-automation="jobListingDate"]', has_text=timeframe)
         )
         job_count = await job_cards.count()
         print(f"Found {job_count} job card(s) posted.")
-
-        PROCESSED_JOBS_FILE = "job_ids.txt"
+         
+        PROCESSED_JOBS_FILE = os.path.join("Users", user, "job_ids.txt")
         if os.path.exists(PROCESSED_JOBS_FILE):
             with open(PROCESSED_JOBS_FILE, "r") as f:
                 processed_ids = set(line.strip() for line in f)
         else:
             processed_ids = set()
 
-        for i in range(0, 3):
-            job = job_cards.nth(i) 
+        for i in range(0,  job_count if pagination else looprange):
+            job = job_cards.nth(i)
             job_id = await job.get_attribute('data-job-id')
             if job_id not in processed_ids:
                 job_link_locator = job.locator('a[data-automation="jobTitle"]')
@@ -100,25 +122,21 @@ async def process_job_listings(public_url):
                     if "quick apply" in apply_btn_text:
                         print("Quick Apply detected. Proceeding...")
 
-                        # Advertiser Name
                         advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
                         await advertiser_name_locator.wait_for(state='visible')
                         advertiser_name = await advertiser_name_locator.inner_text()
                         print(f"Advertiser name: {advertiser_name}")
 
-                        # Job Type
                         job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
                         await job_type_locator.wait_for(state='visible')
                         job_type = await job_type_locator.inner_text()
                         print(f"Job type: {job_type}")
 
-                        # Job Location
                         job_location_locator = page.locator('span[data-automation="job-detail-location"]')
                         await job_location_locator.wait_for(state='visible')
                         job_location = await job_location_locator.inner_text()
                         print(f"Job location: {job_location}")
 
-                        # Work Type
                         job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
                         await job_work_type_locator.wait_for(state='visible')
                         job_work_type = await job_work_type_locator.inner_text()
@@ -127,69 +145,257 @@ async def process_job_listings(public_url):
                         job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
                         raw_html = await job_details_locator.inner_html()
 
-                        await message_input.fill(f"{job_title} @ {advertiser_name}") 
-                        send_icon = wa.locator("//span[@data-icon='send']")
-                        await send_icon.wait_for(state="visible")
-                        await send_icon.click()
+                        # Generate summary and suitability report
+                        summary = gen_summary(job_title, advertiser_name, job_type, job_location, job_work_type, raw_html)
+                        suitable_json = is_suitable(user, job_title, advertiser_name, job_type, job_location, job_work_type, raw_html)
+                        suitable_raw = suitable_json.get("suitable", False)
 
-                        summary = gen_summary(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
+                        # Normalize it to boolean
+                        if isinstance(suitable_raw, str):
+                            suitable_bool = suitable_raw.strip().lower() == "true"
+                        else:
+                            suitable_bool = bool(suitable_raw)
 
-                        await message_input.fill(summary)
-                        await send_icon.click()
+                        status_line = "✅ Suitable" if suitable_bool else "❌ Not Suitable"
+                        reason_text = suitable_json.get("reason", "No reason provided.")
+                        reason_line = f"Reason: {reason_text}"
 
-                        #suitable = is_suitable(job_title,advertiser_name,job_type,job_location,job_work_type,raw_html)
-                        #if suitable:
-                        #   print(f"{job_title} @ {advertiser_name} is a match.")
+                        suitable_report = f"{status_line}\n\n{reason_line}".strip()
+
+                        # Send summary and suitability report on Telegram
+                        combined_message = f"{job_title} @ {advertiser_name}\n\n{summary}"
+                        send_telegram_message(combined_message)
+                        send_telegram_message(suitable_report)
+                        #import urllib.parse
+                        # params = {
+                        #     'job_id': job_id,
+                        #     'title': job_title,
+                        #     'advertiser': advertiser_name,
+                        #     'suitable': suitable_bool
+                        # }
+                        # encoded_params = urllib.parse.urlencode(params)
+                        # apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
+
+                        if suitable_bool:
+                            # Suitable: proceed with quick apply
+                            print("Quick applying...")
+
+                            resume_extra,cl_extra = "", ""
+                            resume_pdf_path = await agenerate_resume(user, job_id, job_title, advertiser_name, raw_html,resume_extra, browser)
                             
-                        params = {
-                            'job_id': job_id,
-                            'title': job_title,
-                            'advertiser': advertiser_name
-                        }
-                        encoded_params = urllib.parse.urlencode(params)
-                        apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
+                            directory = os.path.join("Users", user, "mycv")
+                            file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
+                            print(f"PDF path: {file_path}")
+                            assert os.path.exists(file_path), f"File not found at {file_path}"
 
-                        # Print or use this URL wherever you need
-                        print(f"Apply via URL: {apply_url}")
+                            async with page.context.expect_page() as new_page_info:
+                                await apply_btn_locator.click()
+                            new_page = await new_page_info.value
+                            await new_page.wait_for_load_state("load")
 
-                        await message_input.fill(f"Generate resume and cover letter: {apply_url}")
-                        await send_icon.click()
-                        print(f"Sent URL to Whatsapp: {apply_url}")    
-                        with open(PROCESSED_JOBS_FILE, "a") as f:
-                            f.write(f"{job_id}\n")
-                        processed_ids.add(job_id)  
-                        # else:
-                        #     await message_input.fill(f"{job_title} @ {advertiser_name} was not a match.") 
-                        #     await send_icon.click() 
-                        #     print(f"{job_title} @ {advertiser_name} is not a match.")   
+                            if new_page.url.startswith("https://www.seek.com.au/"):
+                                target_url = f"https://www.seek.com.au/job/{job_id}"  
+                                print(new_page.url)
+                                submit_btn_locator = new_page.locator('//button[@data-testid="review-submit-application"]') 
+                                try:
+                                    
+                                    dropdown = new_page.locator("//select[@data-testid='select-input']")
+                                    await dropdown.wait_for(state="attached", timeout=5000)
+                                    try:
+                                        await dropdown.select_option(index=1, timeout=5000)
+
+                                        delete_btn = new_page.locator("//button[@id='deleteResume']")
+                                        await delete_btn.wait_for(state="visible", timeout=5000)
+                                        await delete_btn.click()
+
+                                        delete_cfmbtn = new_page.locator("//button[@data-testid='delete-confirmation']")
+                                        await delete_cfmbtn.wait_for(state="visible", timeout=5000)
+                                        await delete_cfmbtn.click()
+                                    except Exception as e:
+                                        print(f"Error deleting resume options: {e}")
+
+                                    resume_upload_radio = new_page.locator('//input[@data-testid="resume-method-upload"]')
+                                    await resume_upload_radio.wait_for(state="visible", timeout=5000)
+                                    await resume_upload_radio.click()
+
+                                    resume_upload_btn = new_page.locator("//button[@id='resume-file-:ra:']")
+                                    await resume_upload_btn.wait_for(state="visible", timeout=5000)
+
+                                    file_input = new_page.locator("//div[@data-testid='resumeFileInput']/input[@id='resume-fileFile']")
+                                    await file_input.wait_for(state="attached", timeout=5000)
+                                    await file_input.set_input_files(file_path)
+
+                                    cover_letter,_ = agen_cover_letter(user, job_title, advertiser_name, raw_html, raw_html, cl_extra)
+
+                                    cover_letter_radio = new_page.locator('//input[@type="radio" and @data-testid="coverLetter-method-change"]')
+                                    await cover_letter_radio.wait_for(state="attached")
+                                    await cover_letter_radio.click()
+
+                                    cover_letter_textarea = new_page.locator('//textarea[@data-testid="coverLetterTextInput"]')
+                                    await cover_letter_textarea.wait_for(state="visible")
+                                    await cover_letter_textarea.fill(cover_letter)
+
+                                    cont_btn_locator = new_page.locator('//button[@data-testid="continue-button"]')
+                                    await cont_btn_locator.wait_for(state="visible", timeout=3000)
+                                    await cont_btn_locator.click()
+                                    print("Proceeding to Q&A page...!\n")
+
+                                    try:
+                                        await cont_btn_locator.wait_for(state="visible", timeout=3000)
+                                        await cont_btn_locator.click()
+                                        
+
+                                        career_history = new_page.locator("//h3[text()='Career history']")
+
+                                        if await career_history.is_visible(timeout=5000):
+                                            print("Bypassed Q&A, proceeding to Career History page...!\n")  
+                                        else:
+                                            try:
+                                                form_locator = new_page.locator("form") 
+                                                await form_locator.first.wait_for(state="visible", timeout=3000)
+                                                form_html = await form_locator.first.inner_html()
+                                                actions = get_question_actions(user, form_html)
+                                                print(f"Actions:\n{actions}")
+                                                messages = []
+
+                                                for i, act in enumerate(actions):
+                                                    try:
+                                                        msg = f"\nAnswering ({i+1}/{len(actions)}): {act['question']} --> {act.get('chosen_label', act.get('value'))}"
+                                                        print(msg)
+                                                        messages.append(msg)
+
+                                                        locator = new_page.locator(f"xpath={act['xpath']}")
+                                                        print(f"Waiting for element: {act['xpath']}")
+                                                        await locator.wait_for(state="visible", timeout=5000)
+
+                                                        if act["action"] == "select_option":
+                                                            await locator.select_option(index=act["index"])
+                                                        elif act["action"] == "fill":
+                                                            await locator.fill(act["value"])
+                                                        elif act["action"] == "check":
+                                                            if not await locator.is_checked():
+                                                                await locator.check()
+                                                        elif act["action"] == "choose_radio":
+                                                            await locator.click()
+
+                                                        print(f"✔️ Successfully answered: {act['question']}")
+                                                        
+                                                    except Exception as e:
+                                                        import traceback
+                                                        error_msg = f"❌ Error with question: '{act['question']}' | XPath: {act['xpath']} | Error: {str(e)}"
+                                                        print(error_msg)
+                                                        traceback.print_exc()
+
+
+                                                # After all actions
+                                                full_message = "\n".join(messages)
+                                                print(full_message)
+                                                send_telegram_message(full_message)
+                                            except Exception as e:
+                                                        import traceback
+                                                        error_msg = f"Error: {str(e)}"
+                                                        print(error_msg)
+                                                        traceback.print_exc()
+                                                        messages.append(error_msg)
+
+                                        try: 
+                                            await cont_btn_locator.wait_for(state="visible", timeout=3000)
+                                            await cont_btn_locator.click()
+                                        except:
+                                            print("Submit page.")
+
+                                        # if await career_history.is_visible(timeout=5000):
+                                        #     print("Bypassed Q&A, proceeding to Career History page...!\n") 
+                                        # else:
+                                        #     print("Career history h3 not visible.") 
+
+                                    except Exception as e:
+                                        print(f"Error continuing application steps: {e}")
+
+                                    await cont_btn_locator.wait_for(state="visible", timeout=3000)
+                                    await cont_btn_locator.click()
+
+                                    # docs_included = new_page.locator("h3", has_text="Documents included")
+
+                                    # if await docs_included.is_visible(timeout=5000):
+                                    #     print("detected docs_included header")
+                                    try:
+                                        privacy_checkbox = new_page.locator('//input[@type="checkbox" and contains(@id, "privacyPolicy")]')
+                                        await privacy_checkbox.wait_for(state="visible", timeout=1000)
+                                        if not await privacy_checkbox.is_checked():
+                                            await privacy_checkbox.check()
+                                            print("Privacy policy checkbox checked.")  
+                                    except Exception as e:
+                                                    error_msg = f"Error: {str(e)}"
+                                                    print(error_msg)
+                                                    import traceback
+                                                    traceback.print_exc()
+                                                    messages.append(error_msg)
+
+                                    try:
+                                        await submit_btn_locator.wait_for(state="visible", timeout=3000)
+                                        await submit_btn_locator.click()
+                                        send_telegram_message(f"Applied successfully: {target_url}")
+                                    except Exception as e:
+                                        print(f"Error clicking submit button: {e}")
+                                        send_telegram_message(f"Application incomplete, apply manually with cover letter.\n {target_url}")
+                                        send_telegram_message(cover_letter)
+
+                                except Exception as e:
+                                    print(f"Error during quick apply/ submit page detected (?): {e}")
+                                    try:
+
+                                        await submit_btn_locator.wait_for(state="visible", timeout=3000)
+                                        await submit_btn_locator.click()
+                                        send_telegram_message(f"Applied successfully: {target_url}")
+                                    except Exception as e:
+                                        print(f"Error clicking submit button: {e}")
+                                        send_telegram_message(f"Application incomplete, apply manually with cover letter.\n {target_url}")
+                                        send_telegram_message(cover_letter)
+
+                                finally:
+                                    await page.bring_to_front()
+
+                        else:
+                            # Not suitable: send apply URL message only
+                            print("Not suitable.")
+                            #send_telegram_message(f"Generate resume and cover letter:\n {apply_url}")
+
+
 
                 except Exception as e:
                     print(f"Error: {e}. Skipping the page.")
                     import traceback
                     traceback.print_exc()
+                finally:
+                        # Mark job as processed
+                        with open(PROCESSED_JOBS_FILE, "a") as f:
+                            f.write(f"{job_id}\n")
+                        processed_ids.add(job_id)
+
             else:
                 print(f"Job ID {job_id} is already processed.")
 
-        await page.wait_for_timeout(2000)
-        await browser.close()
-        break
+        if pagination:
+            try:
+                next_button = page.locator("//span[contains(text(),'Next')]").first
+                await next_button.wait_for(state="visible", timeout=3000)
+                await next_button.click()
+                print("Navigating to next page...")
+                await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
+                await page.wait_for_timeout(5000)
+            except Exception:
+                print("No more pages available. Exiting loop.")
+                break
 
-        # Check if the "Next" button exists
-        # try:
-        #     next_button = page.locator("//span[contains(text(),'Next')]").first
-        #     await next_button.wait_for(state="visible", timeout=3000)
-        #     await next_button.click()
-        #     print("Navigating to next page...")
-        #     await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
-        #     await page.wait_for_timeout(5000)
-        # except Exception:
-        #     print("No more pages available. Exiting loop.")
-        #     break
+    await page.wait_for_timeout(2000)
+    await browser.close()
+
 
 async def start_job_processing():
     await init_browser()
     await process_job_listings(public_url)
 
-# threading.Thread(target=asyncio.run, args=(start_job_processing(),)).start()
 asyncio.run(start_job_processing())
-    
+
+

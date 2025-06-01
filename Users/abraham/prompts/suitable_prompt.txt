@@ -1,0 +1,33 @@
+{json_resume}
+This is my resume in JSON format.
+Summarize and evaluate this job for my suitability:
+
+Job Details:
+- Name: {name}
+- Advertised by: {adv}
+- Job type: {jtype}
+- Location: {loc}
+- Work Type: {wtype}
+- Job Description (raw HTML): {desc}
+
+Instructions:
+1. Check the job description and determine if I am suitable for this job.
+2. You **must** answer "no" if **any** of these conditions are met:
+    - The job is mainly related to driving.
+    - A working with children check (WWCC) is essential.
+    - Forklift license/experience is essential.
+    - The job is for a chef requiring certifications in commercial cookery.
+    - The job is advertised by Journey Beyond.
+3. Else, answer "yes" if I am generally suitable.
+4. Provide a short reason if not suitable.
+5. Estimate and include a confidence score (in percentage) for your decision.
+
+Respond strictly in this JSON format:
+
+{{
+  "suitable": true or false,
+  "reason": "Your explanation here.",
+  "confidence": 0 to 100
+}}
+
+If confidence is below 50%, set "suitable" to false even if no disqualifying conditions are met.

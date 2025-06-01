@@ -1,191 +1,216 @@
-from playwright.sync_api import sync_playwright
+import asyncio
 import os
-from gemini import gen_cover_letter, generate_resume
+from playwright.async_api import async_playwright
+from tenacity import retry, stop_after_attempt, wait_fixed
+from gemini import agen_cover_letter, agenerate_resume, get_question_actions
+from pathlib import Path
 
-# Define the user data directory path
-user_data_dir = "C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\Automator\\chrome_profile"
-extension_path = "C:\\Users\\abrah\\OneDrive\\Desktop\\Projects\\cover_letter_extension"
+# Configuration
+user = 'abraham_paul_jaison'
 
-# Ensure the directory exists
-if not os.path.exists(user_data_dir):
-    os.makedirs(user_data_dir)
+USER_DATA_DIR  = os.path.abspath(os.path.join("Users", user, "chrome_profile"))
+EXTENSION_PATH = r"C:\Users\abrah\OneDrive\Desktop\Projects\cover_letter_extension"
+DEFAULT_TIMEOUT = 5000
+NAVIGATION_TIMEOUT = 30000
+SHORT_TIMEOUT = 3000
 
-with sync_playwright() as p:
-    browser = p.chromium.launch_persistent_context(
-        user_data_dir=user_data_dir,
-        headless=False, 
-        args=[
-            f'--load-extension={extension_path}',
-            '--disable-blink-features=AutomationControlled',
-            '--no-sandbox',
-            '--disable-web-security',
-            '--disable-infobars',
-            f'--disable-extensions-except={extension_path}',
-            "--start-maximized",
-        ],
+# Ensure directories exist
+if not os.path.exists(USER_DATA_DIR):
+    os.makedirs(USER_DATA_DIR)
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+async def click_element(locator, timeout=DEFAULT_TIMEOUT):
+    """Click an element after ensuring it's visible."""
+    await locator.wait_for(state="visible", timeout=timeout)
+    await locator.click()
+
+async def init_browser():
+    """Initialize Playwright browser with persistent context."""
+    print("Initializing browser...")
+    playwright = await async_playwright().start()
+    browser = await playwright.chromium.launch_persistent_context(
+        user_data_dir=str(USER_DATA_DIR),
+        headless=False,
         no_viewport=True
     )
-    page = browser.pages[0]
-    page.set_default_timeout(10000)  # Set global timeout to 3 seconds
-    page.set_default_navigation_timeout(30000)
+    return playwright, browser
 
-    # 3 days
-    A = "https://www.seek.com.au/jobs/in-All-Adelaide-SA?classification=6251%2C1200%2C1204%2C6163%2C1209%2C1212%2C6281%2C6092%2C6008%2C6043%2C6362%2C1223%2C1225&daterange=3&sortmode=ListedDate&subclassification=6226%2C6229%2C6143%2C6166%2C6168%2C6169%2C6171%2C6172%2C6095%2C6093%2C6097%2C6099%2C6101%2C6104%2C6105%2C6103%2C6106%2C6109%2C6108&worktype=243%2C245"
-    # 1 day
-    AA = "https://www.seek.com.au/jobs/in-All-Adelaide-SA?classification=6251%2C1200%2C1204%2C6163%2C1209%2C1212%2C6281%2C6092%2C6008%2C6043%2C6362%2C1223%2C1225&daterange=1&sortmode=ListedDate&subclassification=6226%2C6229%2C6143%2C6166%2C6168%2C6169%2C6171%2C6172%2C6095%2C6093%2C6097%2C6099%2C6101%2C6104%2C6105%2C6103%2C6106%2C6109%2C6108&worktype=243%2C245"
-    page.goto(A)
+async def process_job_listings(playwright, browser):
+    """Process job listings and apply to suitable jobs."""
+    page = await browser.new_page()
+    page.set_default_timeout(DEFAULT_TIMEOUT)
+    page.set_default_navigation_timeout(NAVIGATION_TIMEOUT)
 
+    # Load job search URL
+# Read job search URL from file
+    file_path = os.path.join("Users", user, "filter.txt")
+    with open(file_path, "r") as f:
+        job_url = f.read().strip()
+    await page.goto(job_url)
 
-    while True:  # Loop to go through all pages of job listings 
-
+    while True:
+        # Locate job cards
         job_cards = page.locator('[id^="jobcard-"]')
-        job_count = job_cards.count()
-        print(f"Found {job_count} job cards.")
+        job_count = await job_cards.count()
+        print(f"Found {job_count} job card(s) posted.")
 
-        for i in range(1, job_count + 1):
-        #for i in range(1, 2):
-            job_link_locator = page.locator(f'//*[@id="jobcard-{i}"]/div[2]/a')
+        for i in range(1, job_count+1):
+            job = job_cards.nth(i)
+            job_id = await job.get_attribute('data-job-id')
+
             try:
-                job_link_locator.wait_for(state="visible")
-
-                job_link_locator.click()
-
-                # Job Title
-                h1_locator = page.locator('//h1[@data-automation="job-detail-title"]/a')
-                h1_locator.wait_for(state="visible")
-                job_title = h1_locator.inner_text()
+                # Navigate to job details
+                await click_element(job.locator('a[data-automation="jobTitle"]'))
+                job_title = await page.locator('//h1[@data-automation="job-detail-title"]/a').inner_text()
+                print(f"\n------------------------------------------------------------------------------------")
                 print(f"Retail Job found: {job_title}")
 
-                # Advertiser Name
-                advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
-                advertiser_name_locator.wait_for(state='visible')
-                advertiser_name = advertiser_name_locator.inner_text().strip()
-                print(f"Advertiser name: {advertiser_name}")
-
-                apply_btn_locator = page.locator('//a[@data-automation="job-detail-apply"]')
-                apply_btn_locator.wait_for(state="visible")
-                apply_btn_text = apply_btn_locator.inner_text().strip().lower()
+                # Check for Quick Apply
+                apply_btn = page.locator('//a[@data-automation="job-detail-apply"]')
+                await apply_btn.wait_for(state="visible")
+                apply_btn_text = (await apply_btn.inner_text()).strip().lower()
                 print(f"Button text detected: {apply_btn_text}")
 
-                if "quick apply" in apply_btn_text:
-                    print("Quick Apply detected. Proceeding...")
-
-                    job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
-                    job_type_locator.wait_for(state='visible')
-                    job_type = job_type_locator.inner_text().strip().lower()
-                    print(f"Job type: {job_type}")
-
-                    job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
-                    raw_html = job_details_locator.inner_html()
-
-                    # if is_admin_job(raw_html):
-                    #     print("Admin job detected.")
-
-                    cover_letter = gen_cover_letter(raw_html)
-                    resume_pdf_path = generate_resume(job_title, advertiser_name, raw_html, browser)
-
-                    if "error" in resume_pdf_path.lower():
-                        print("Resume wasn't generated")
-                        print(resume_pdf_path)
-                        break
-
-                    
-                    print("Quick Applying...")
-
-                    with page.context.expect_page() as new_page_info:
-                        apply_btn_locator.click()
-                    new_page = new_page_info.value
-                    new_page.wait_for_load_state()
-
-                    if new_page.url.startswith("https://www.seek.com.au/"):
-                        print(new_page.url)
-                        try:
-                            
-                            dropdown = new_page.locator("//select[@id=':r3:']")
-                            dropdown.wait_for(state="attached", timeout=5000)
-                            try:
-                                dropdown.select_option(index=1, timeout=5000) 
-                                delete_btn = new_page.locator("//button[@id='deleteResume']")
-                                delete_btn.wait_for(state="visible", timeout=5000)
-                                delete_btn.click()
-                                delete_cfmbtn = new_page.locator("//button[@data-testid='delete-confirmation']")
-                                delete_cfmbtn.wait_for(state="visible", timeout=5000)
-                                delete_cfmbtn.click()
-                            except Exception as e:
-                                print(f"Error: {e}. No resume options found to delete.")
-
-
-                            resume_upload_radio = new_page.locator('//input[@data-testid="resume-method-upload"]')
-                            resume_upload_radio.wait_for(state="visible", timeout=5000)
-                            resume_upload_radio.click()
-
-                            resume_upload_btn = new_page.locator("//button[@id='resume-file-:r2:']")
-                            resume_upload_btn.wait_for(state="visible", timeout=5000)
-
-                            directory = "C:/Users/abrah/Downloads/mycv"
-                            file_path = os.path.abspath(os.path.join(directory, f"{resume_pdf_path}"))
-                            print(f"PDF path: {file_path}")
-                            
-
-                            file_input = new_page.locator("//div[@data-testid='resumeFileInput']/input[@id='resume-fileFile']")
-                            file_input.wait_for(state="attached", timeout=5000)
-                            file_input.set_input_files(file_path)
-
-
-                            cover_letter_radio = new_page.locator('//input[@type="radio" and @data-testid="coverLetter-method-change"]')
-                            cover_letter_radio.wait_for(state="attached")
-                            cover_letter_radio.click()
-
-                            cover_letter_textarea = new_page.locator('//textarea[@data-testid="coverLetterTextInput"]')
-                            cover_letter_textarea.wait_for(state="visible")
-                            cover_letter_textarea.fill(cover_letter)
-
-                            cont_btn_locator = new_page.locator('//button[@data-testid="continue-button"]')
-                            cont_btn_locator.wait_for(state="visible", timeout=3000)
-                            cont_btn_locator.click()
-                            print("Cover Letter Generated!")
-                            print("\n")
-
-                            try:
-                                cont_btn_locator.wait_for(state="visible", timeout=3000)
-                                cont_btn_locator.click()
-
-                                cont_btn_locator.wait_for(state="visible", timeout=3000)
-                                cont_btn_locator.click()
-                            except Exception as e:
-                                print(f"Error: {e}. Cannot continue further, may require manual input.")
-
-                            page.bring_to_front()
-
-                            if new_page.url.endswith("profile"):
-                                cont_btn_locator.wait_for(state="visible", timeout=3000)
-                                cont_btn_locator.click()
-
-                        except Exception as e:
-                            print(f"Error: {e}. Skipping the page.")
-                            import traceback
-                            traceback.print_exc()
-                    else:
-                        print("The page URL does not match, skipping...")
-                else:
+                if "quick apply" not in apply_btn_text:
                     print("No Quick Apply option, skipping...")
-            except Exception as e:
-                print(f"Error: {e}. Skipping the page.")
-                import traceback
-                traceback.print_exc()
+                    continue
 
-        # Check if the "Next" button exists
+                # Extract job details
+                details = {
+                    "advertiser_name": await page.locator('span[data-automation="advertiser-name"]').inner_text(),
+                    "job_type": await page.locator('span[data-automation="job-detail-classifications"]').inner_text(),
+                    "job_location": await page.locator('span[data-automation="job-detail-location"]').inner_text(),
+                    "job_work_type": await page.locator('span[data-automation="job-detail-work-type"]').inner_text(),
+                    "raw_html": await page.locator('div[data-automation="jobAdDetails"]').inner_html(),
+                }
+                print(f"Advertiser: {details['advertiser_name']}, Location: {details['job_location']}")
+
+                # Generate resume and cover letter
+                resume_extra, cl_extra = "", ""
+                resume_pdf_path = await agenerate_resume(
+                    user, job_id, job_title, details['advertiser_name'], details['raw_html'], resume_extra, browser
+                )
+                if "error" in resume_pdf_path.lower():
+                    print(f"Resume generation failed: {resume_pdf_path}")
+                    continue
+
+                cover_letter, _ = agen_cover_letter(
+                    user, job_title, details['advertiser_name'], details['raw_html'], details['raw_html'], cl_extra
+                )
+
+                # Start Quick Apply
+                print("Quick Applying...")
+                async with page.context.expect_page() as new_page_info:
+                    await click_element(apply_btn)
+                new_page = await new_page_info.value
+                await new_page.wait_for_load_state("load")
+
+                if not new_page.url.startswith("https://www.seek.com.au/"):
+                    print(f"Unexpected URL: {new_page.url}, skipping...")
+                    await new_page.close()
+                    continue
+
+                # Handle resume upload
+                try:
+                    # Delete existing resume if present
+                    dropdown = new_page.locator("//select[@data-testid='select-input']")
+                    if await dropdown.is_visible(timeout=SHORT_TIMEOUT):
+                        await dropdown.select_option(index=1)
+                        delete_btn = new_page.locator("//button[@id='deleteResume']")
+                        if await delete_btn.is_visible(timeout=SHORT_TIMEOUT):
+                            await click_element(delete_btn)
+                            await click_element(new_page.locator("//button[@data-testid='delete-confirmation']"))
+
+                    # Upload new resume
+                    await click_element(new_page.locator('//input[@data-testid="resume-method-upload"]'))
+                    directory = os.path.join("Users", user, "mycv")
+
+                    resume_path = Path(os.path.abspath(os.path.join(directory, f"{resume_pdf_path}")))
+                    if not resume_path.exists():
+                        print(f"Resume not found at {resume_path}")
+                        continue
+                    await new_page.locator("//div[@data-testid='resumeFileInput']/input[@id='resume-fileFile']").set_input_files(str(resume_path))
+
+                    # Upload cover letter
+                    await click_element(new_page.locator('//input[@type="radio" and @data-testid="coverLetter-method-change"]'))
+                    await new_page.locator('//textarea[@data-testid="coverLetterTextInput"]').fill(cover_letter)
+                    print("Cover Letter Generated!")
+
+                    # Navigate application steps
+                    cont_btn = new_page.locator('//button[@data-testid="continue-button"]')
+                    await click_element(cont_btn)
+
+                    # Handle Q&A or Career History
+                    if await new_page.locator("h3", has_text="Career history").is_visible(timeout=SHORT_TIMEOUT):
+                        print("Bypassed Q&A, on Career History page...")
+                    else:
+                        form = new_page.locator("form").first
+                        if await form.is_visible(timeout=SHORT_TIMEOUT):
+                            actions = get_question_actions(user, await form.inner_html())
+                            print(f"Actions:\n{actions}")
+                            for act in actions:
+                                answer_text = act.get('chosen_option', act.get('value'))
+                                print(f"Answering: {act['question']} --> {answer_text}")
+                                locator = new_page.locator(act["xpath"])
+                                await locator.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                                if act["action"] == "select_option":
+                                    await locator.select_option(index=act["index"])
+                                elif act["action"] == "fill":
+                                    await locator.fill(act["value"])
+                                elif act["action"] == "check":
+                                    if not await locator.is_checked():
+                                        await locator.check()
+                                elif act["action"] == "choose_radio":
+                                    await locator.click()
+
+                    # Final steps
+                    await click_element(cont_btn)
+                    if await new_page.locator("h3", has_text="Documents included").is_visible(timeout=SHORT_TIMEOUT):
+                        print("Detected docs_included header")
+                        privacy_checkbox = new_page.locator('//input[@type="checkbox" and contains(@id, "privacyPolicy")]')
+                        if await privacy_checkbox.is_visible(timeout=SHORT_TIMEOUT) and not await privacy_checkbox.is_checked():
+                            await privacy_checkbox.check()
+                            print("Privacy policy checkbox checked.")
+                        await click_element(new_page.locator('//button[@data-testid="review-submit-application"]'))
+                        print(f"Applied successfully: {new_page.url}")
+                    else:
+                        print("Debugging: Could not reach submission page.")
+
+                    await new_page.close()
+
+                except Exception as e:
+                    print(f"Error during application for job {job_id}: {e}")
+                    await new_page.close()
+
+            except Exception as e:
+                print(f"Error processing job {job_id}: {e}")
+                continue
+
+        # Pagination
         try:
-            
             next_button = page.locator("//span[contains(text(),'Next')]").first
-            next_button.wait_for(state="visible", timeout=3000)
-            next_button.click()
+            if not await next_button.is_enabled(timeout=SHORT_TIMEOUT):
+                print("No more pages available. Exiting loop.")
+                break
+            await click_element(next_button)
             print("Navigating to next page...")
-            page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
-            page.wait_for_timeout(5000)
+            await page.wait_for_load_state("domcontentloaded")
+            await page.wait_for_timeout(2000)  # Reduced from 5000ms for faster navigation
         except Exception:
             print("No more pages available. Exiting loop.")
             break
 
-    input("Press Enter to close the browser...")
-    browser.close()
+    await browser.close()
+    await playwright.stop()
+
+async def start_job_processing():
+    """Start the job processing workflow."""
+    playwright, browser = await init_browser()
+    try:
+        await process_job_listings(playwright, browser)
+    finally:
+        await browser.close()
+        await playwright.stop()
+
+if __name__ == "__main__":
+    asyncio.run(start_job_processing())
