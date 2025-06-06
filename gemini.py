@@ -1,4 +1,5 @@
 from utils import generate_cl_prompt, generate_resume_prompt
+from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 import subprocess
@@ -6,7 +7,10 @@ import os
 import re
 
 # ========== GLOBAL CONFIG ==========
-API_KEY = "AIzaSyDKeLDQgsIO2esEx_eN7bhl9NCjP04bI_U"
+load_dotenv()  # loads .env file
+API_KEY = os.getenv("GOOGLE_API_KEY")
+#print(API_KEY)
+
 CL_RESUME_FILE = "clres.txt"
 RESUME_FILE = "resume.txt"
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))

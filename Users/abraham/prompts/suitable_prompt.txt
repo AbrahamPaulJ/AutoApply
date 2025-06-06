@@ -18,6 +18,7 @@ Instructions:
     - Forklift license/experience is essential.
     - The job is for a chef requiring certifications in commercial cookery.
     - The job is advertised by Journey Beyond.
+    - Ths job is advertised by Uniq Impressions.
 3. Else, answer "yes" if I am generally suitable.
 4. Provide a short reason if not suitable.
 5. Estimate and include a confidence score (in percentage) for your decision.
