@@ -1,13 +1,13 @@
 @echo off
 setlocal
 
-set UI_MODE=1
+set UI_MODE=0
 ::set LOOPRANGE=5
 ::set USER=abraham
 
 :: Time limit in minutes
 set MAX_RUNTIME_MINUTES=600
-set INTERVAL_MINUTES=30
+set INTERVAL_MINUTES=3
 set /a INTERVAL_SECONDS=%INTERVAL_MINUTES% * 60
 
 :: Start asyncserve.py in a new terminal

@@ -12,3 +12,4 @@ tests/
 legacy/
 analyse.py
 README.md
+scrape_concurrent.bat

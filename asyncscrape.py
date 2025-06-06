@@ -10,11 +10,11 @@ from utils import clear_job_ids
 
 # Default mode
 submit = True
-#clear_job_ids()
+clear_job_ids()
 pagination = False
 looprange = 5
 timeframe = re.compile(r'(5|[1-5]\d|60)m')  # 5–60 mins
-ui_mode = 0
+ui_mode = 1
 
 user = 'abraham'
 
@@ -385,9 +385,9 @@ async def process_job_listings(public_url):
                             print("Not suitable.")
 
                 except Exception as e:
-                    print(f"Error: {e}. Skipping the page.")
-                    import traceback
-                    traceback.print_exc()
+                    print(f"Error: No apply button detected/ already applied. Skipping.")
+                    # import traceback
+                    # traceback.print_exc()
                 
                 finally:
                     with open(PROCESSED_JOBS_FILE, "a") as f:

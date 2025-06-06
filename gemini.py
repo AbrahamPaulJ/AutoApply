@@ -200,7 +200,7 @@ def get_question_actions(user: str, html: str):
     "fill_value":"<short answer depending on the question>"           // only for textarea
     }}
 
-    For clarity and consistency, here are separate JSON examples for each `question_type`:
+    For clarity and consistency, here are separate JSON examples for each `question_type`. Please use the same xpath structure in the examples:
 
     [
     // SELECT
