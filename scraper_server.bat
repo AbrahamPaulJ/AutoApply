@@ -1,17 +1,17 @@
 @echo off
 setlocal
 
-set LOOPRANGE=5
-set TIMEFRAME=\\d{1,2}m
-set USER=abraham_paul_jaison
+set UI_MODE=1
+::set LOOPRANGE=5
+::set USER=abraham
 
 :: Time limit in minutes
 set MAX_RUNTIME_MINUTES=600
-set INTERVAL_MINUTES=2
+set INTERVAL_MINUTES=30
 set /a INTERVAL_SECONDS=%INTERVAL_MINUTES% * 60
 
 :: Start asyncserve.py in a new terminal
-start "Serve Script" cmd /k python asyncserve.py
+:: start "Serve Script" cmd /k python asyncserve.py
 
 :: Wait for asyncserve to fully boot up (ngrok included)
 :: echo Waiting 5 seconds for asyncserve to initialize...
@@ -27,12 +27,12 @@ for /f %%i in ('powershell -command "[int](Get-Date -UFormat %%s)"') do set now_
 :: Calculate elapsed time
 set /a elapsed_seconds=%now_seconds% - %start_seconds%
 set /a elapsed_minutes=%elapsed_seconds% / 60
-
+	
 :: Check if MAX_RUNTIME_MINUTES have passed
 if %elapsed_minutes% GEQ %MAX_RUNTIME_MINUTES% goto end
 
 :: Run asyncscrape.py in a temporary terminal
-start "" cmd /c python asyncscrape.py %LOOPRANGE% %TIMEFRAME% %USER%
+start "" cmd /c python asyncscrape.py %UI_MODE% %LOOPRANGE% %USER%
 
 :: Show time until next scrape
 echo [%time%] asyncscrape.py triggered. Waiting %INTERVAL_MINUTES% minutes until next run...

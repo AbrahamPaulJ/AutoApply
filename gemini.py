@@ -207,36 +207,34 @@ def get_question_actions(user: str, html: str):
     {{
         "question_type": "select",
         "question": "What is your current employment status?",
-        "xpath": "/html/body/div/form/select[@id='employment_status']",
+        "xpath": "//select/parent::div/parent::div/parent::div/div/span[contains(., "What is your current employement status")][1]",
         "options": ["Employed", "Unemployed", "Student", "Other"],
         "chosen_label": "Student",
-        "chosen_option": "<value attribute of the selected option here>"  // MUST be option value, not visible text
     }},
 
-    // RADIO (FIELDSET)
+    // RADIO 
     {{
         "question_type": "radio",
         "question": "Are you legally allowed to work in Australia?",
-        "xpath": "/html/body/div/form/input[@name='work_rights'][@value='Yes']",
+        "xpath": "//input[@type='radio' and @id=':r1f:']",
         "chosen_label": "Yes",
         "chosen_option": "<value attribute of the selected radio button>"  // MUST be input value attribute
     }},
 
-    // CHECKBOX
+    // CHECKBOX (FIELDSET)
     {{
         "question_type": "checkbox",
         "question": "Which shifts are you available for?",
-        "xpath": "/html/body/div/form/input[@name='shift_morning']",
+        "xpath": "//span[normalize-space()='<question>']/ancestor::div[2]//label[.//span[normalize-space()='<selected_option>']]/parent::div/parent::div/parent::div/parent::div/div/input",
         "options": ["Morning", "Afternoon", "Night"],
-        "chosen_labels": ["Morning", "Afternoon"]
-        "selected_options": ["<value attribute for Morning>", "<value attribute for Afternoon>"]  // MUST be values, not visible labels
+        "selected_options": ["Morning", "Afternoon"]              //These contain the selected option, DO NOT OMIT
     }},
 
     // TEXTAREA
     {{
         "question_type": "textarea",
         "question": "Tell us briefly why you are suitable for this role.",
-        "xpath": "/html/body/div/form/textarea[@id='suitability']",
+        "xpath": "//textarea[@aria-describedby=':r21:']",
         "fill_value": "I am reliable, have retail experience, and am available on weekends."  // Text answer
     }}
     ]
@@ -248,15 +246,22 @@ def get_question_actions(user: str, html: str):
         - `//input[@type='radio'][@value='abc']`
         - or using associated label text via `label[normalize-space(text())='...']/following::select[1]`
     - DO NOT GENERATE SHALLOW OR ABSOLUTE XPaths like `/div/div/div/select`. THIS IS VERY IMPORTANT. Ensure the XPath works even if the surrounding div structure changes.
-    - Only append questions that have not been answered to the json. DO NOT append answered questions.
+    - ONLY answer questions if in addition to the form, that are also present in //div[@id='errorPanel'].
     - Return only the fields applicable to the question type.
     - Always use valid JSON.
     - Avoid Markdown or code block wrappers like ```json.
+    - Always choose "Less than 1 year" for experience related questions if available, even if I have no experience.
+    -You MUST answer based on the info I provided, if vague you have to guess. For example:
+        - If the question is "Are you an Australian or New Zealand Citizen?", answer "No".
+        - If it's a Yes/No question and my context clearly answers it, infer the correct option (e.g., "student visa" means NOT a citizen).
 
     Apart from my resume, here is additional context about me:
-    - Male, Indian, on student visa in Adelaide (Walkerville), visa expiring Oct 2026, 24hrs/week limit.
+    - Male, Indian, on student visa subclass 500 in Adelaide (Walkerville), visa expiring Oct 2026, 24hrs/week work limit.
+    - Not an Australian citizen or resident.
+    - I am legally entitled to work in Australia.
+    - I have experience working towards targets and KPIs.
     - No car or driving license. No forklift license.
-    - Less than 1 year experience in QA, testing, cleaning, hospitality, retail, data analytics, administration, bookkeeping etc.
+    - I have experience in QA and testing, cleaning, hospitality, retail, data analytics, administration, bookkeeping etc.
     - Can give 1-week notice from current job.
 
     HTML form:
@@ -266,7 +271,8 @@ def get_question_actions(user: str, html: str):
     response = model.generate_content(prompt)
     response_text = response.text or "Error: No response from Gemini."
 
-    response_text = re.sub(r"^```(?:json)?", "", response_text.strip(), flags=re.IGNORECASE).strip("`\n ")
+    response_text = re.sub(r"^```(?:json)?\s*|\s*```$\n*", "", response_text.strip(), flags=re.IGNORECASE).strip()
+    
     print(response_text)
 
     try:
@@ -281,31 +287,13 @@ def get_question_actions(user: str, html: str):
         qtype = q.get("question_type")
         if qtype == "select":
             chosen_label = q.get("chosen_label")
-            chosen_option = q.get("chosen_option")
-
-            # Match chosen_option against <option value> attributes to get index
-            # But first you must have access to both value-to-label mapping
-            options = q.get("options", [])
-
-            # This is a critical fix: use HTML to extract full <option> list with both label and value
-            # But if not possible, at least don't match value against label
-            # Instead, set index safely like this:
-            selected_index = -1
-            for i, label in enumerate(options):
-                # You may need to inject a value map if options were expanded with values
-                if chosen_label == label:
-                    selected_index = i
-                    break
-
-            if selected_index == -1:
-                print(f"⚠️ Could not match label: '{chosen_label}' in {options}, defaulting to 0")
-                selected_index = 0
+            if not chosen_label:
+                print(f"⚠️ Missing chosen_label for select: {q}")
+                continue
 
             actions.append({
                 "xpath": q["xpath"],
                 "action": "select_option",
-                "value": chosen_option,
-                "index": selected_index,
                 "question": q["question"],
                 "chosen_label": chosen_label
             })
@@ -321,31 +309,26 @@ def get_question_actions(user: str, html: str):
             })
 
         elif qtype == "checkbox":
-            chosen_labels = q.get("chosen_labels", [])
             selected_options = q.get("selected_options", [])
-            
-            # Fallback to chosen_option if selected_options is empty
-            if not selected_options and "chosen_option" in q:
-                selected_options = [q["chosen_option"]]
-                # Also populate chosen_labels with chosen_option as a fallback, assuming it's a label
-                if not chosen_labels:
-                    chosen_labels = [q["chosen_option"]]
+            question = q.get("question", [])
+            # Validate inputs
+            if not selected_options:
+                print(f"⚠️ Missing selected_options for checkbox: {q}")
+                continue
 
-            # Ensure chosen_labels and selected_options have the same length
-            if len(chosen_labels) != len(selected_options):
-                print(f"❌ Warning: Mismatch between chosen_labels ({len(chosen_labels)}) and selected_options ({len(selected_options)}) for question: {q['question']}")
-                chosen_labels = chosen_labels[:len(selected_options)] if chosen_labels else ["" for _ in selected_options]
+            for selected_option in selected_options:
+                # Use label-based XPath for checkboxes
+                xpath = f'//span[normalize-space()="{question}"]/ancestor::div[2]//label[.//span[normalize-space()="{selected_option}"]]/parent::div/parent::div/parent::div/parent::div/div/input'
 
-            for selected_option, chosen_label in zip(selected_options, chosen_labels):
-                # Generate unique XPath for each checkbox based on its value
+
+
                 actions.append({
-                    "xpath": f"//input[@type='checkbox' and contains(@id, '{selected_option}')]",  # dynamic and likely to match
+                    "xpath": xpath,
                     "action": "check",
                     "question": q["question"],
-                    "selected_option": selected_option,
-                    "chosen_label": chosen_label
+                    "chosen_label": selected_option
                 })
-
+            
         elif q['question_type'] == 'radio':
             chosen_label = q.get("chosen_label")
             chosen_option = q.get("chosen_option")
