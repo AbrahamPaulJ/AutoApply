@@ -5,7 +5,7 @@ import os
 import re
 import sys
 import requests
-from gemini import gen_summary, is_suitable, agen_cover_letter, agenerate_resume, get_question_actions
+from gemini import gen_summary, is_suitable, gen_cover_letter, agenerate_resume, get_question_actions
 from utils import clear_job_ids
 
 
@@ -220,7 +220,7 @@ async def process_job_listings():
                                     print(f"Resume uploaded from: {file_path}")
 
                                     print("Generating cover letter...")
-                                    cover_letter, _ = agen_cover_letter(user, job_title, advertiser_name, raw_html, raw_html, cl_extra)
+                                    cover_letter, _ = gen_cover_letter(user, job_title, advertiser_name, raw_html, raw_html, cl_extra)
                                     print("Cover letter generated.")
 
                                     print("Locating cover letter radio button...")

@@ -36,7 +36,7 @@ def gen_summary(name,adv,jtype,loc,wtype,desc) -> str:
     return response.text if response.text else "Error. No response from Gemini"
 
 # ========== ASYNC COVER LETTER FUNCTION ==========
-def agen_cover_letter(user, job_id, job_title, advertiser_name, raw_html, cl_extra=""):
+def gen_cover_letter(user, job_id, job_title, advertiser_name, raw_html, cl_extra=""):
     prompt = generate_cl_prompt(user, raw_html)
 
     # Append additional notes if provided
