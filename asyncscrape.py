@@ -8,9 +8,9 @@ import requests
 from gemini import gen_summary, is_suitable, agen_cover_letter, agenerate_resume, get_question_actions
 from utils import clear_job_ids
 
-# Default mode
+
 submit = True
-clear_job_ids()
+#clear_job_ids()
 pagination = False
 looprange = 5
 timeframe = re.compile(r'(5|[1-5]\d|60)m')  # 5–60 mins
@@ -47,9 +47,7 @@ def send_telegram_message(message):
 
 playwright = None
 browser = None
-with open("ngrok_url.txt", "r") as f:
-    public_url = f.read().strip()
-#print(f"App is accessible at {public_url}")  # Print the public URL
+
 
 async def init_browser():
     global playwright, browser
@@ -72,7 +70,7 @@ async def init_browser():
             no_viewport=True
         )
 
-async def process_job_listings(public_url):
+async def process_job_listings():
     global browser
 
     page = await browser.new_page()
@@ -168,18 +166,9 @@ async def process_job_listings(public_url):
                         combined_message = f"{job_title} @ {advertiser_name} ({job_id})\n\n{summary}"
                         send_telegram_message(combined_message)
                         send_telegram_message(suitable_report)
-                        #import urllib.parse
-                        # params = {
-                        #     'job_id': job_id,
-                        #     'title': job_title,
-                        #     'advertiser': advertiser_name,
-                        #     'suitable': suitable_bool
-                        # }
-                        # encoded_params = urllib.parse.urlencode(params)
-                        # apply_url = f"{public_url}/generate_clcv_request?{encoded_params}"
 
                         if suitable_bool:
-                            # Suitable: proceed with quick apply
+                            # Suitable
                             print("Quick applying...")
 
                             resume_extra,cl_extra = "", ""
@@ -320,21 +309,13 @@ async def process_job_listings(public_url):
                                         except:
                                             print("Submit page.")
 
-                                        # if await career_history.is_visible(timeout=5000):
-                                        #     print("Bypassed Q&A, proceeding to Career History page...!\n") 
-                                        # else:
-                                        #     print("Career history h3 not visible.") 
-
                                     except Exception as e:
                                         print(f"Error continuing application steps: {e}")
 
                                     await cont_btn_locator.wait_for(state="visible", timeout=3000)
                                     await cont_btn_locator.click()
-
                                     # docs_included = new_page.locator("h3", has_text="Documents included")
 
-                                    # if await docs_included.is_visible(timeout=5000):
-                                    #     print("detected docs_included header")
                                     try:
                                         privacy_checkbox = new_page.locator('//input[@type="checkbox" and contains(@id, "privacyPolicy")]')
                                         print("checking pcbox")
@@ -405,7 +386,7 @@ async def process_job_listings(public_url):
                 await next_button.wait_for(state="visible", timeout=3000)
                 await next_button.click()
                 print("Navigating to next page...")
-                await page.wait_for_load_state("domcontentloaded")  # Wait for the new page to load
+                await page.wait_for_load_state("domcontentloaded")  
                 await page.wait_for_timeout(5000)
             except Exception:
                 print("No more pages available. Exiting loop.")
@@ -417,7 +398,7 @@ async def process_job_listings(public_url):
 
 async def start_job_processing():
     await init_browser()
-    await process_job_listings(public_url)
+    await process_job_listings()
 
 asyncio.run(start_job_processing())
 
