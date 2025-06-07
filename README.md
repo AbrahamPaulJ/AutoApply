@@ -16,9 +16,8 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 - Python
 - Node.js (version 18 or higher)
 - Playwright with Chromium
-- Two `chrome_profile` folders  
-  *(Both must be logged into Seek)*
-- ngrok auth Key. Get one for free at https://ngrok.com/docs/api/resources/api-keys/
+- A `chrome_profile` folder
+  *(Must be logged into Seek)*
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
 - A Telegram number to receive the applications in real time.
 
@@ -33,4 +32,4 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 ### ▶️ Run
 - Run `scraper_server.bat` to start scraping in real time.  
 **or**  
-- Run `asyncscrape.py` in UI mode to mass apply all listings from the last 3 days.
+- Run `asyncscrape.py` in UI mode to mass apply for all listings from the last 3 days.
