@@ -24,7 +24,14 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 ---
 
 ### ⚙️ Installation
-- Install `requirements.txt` from the root folder via pip  
+
+```bash
+git clone https://github.com/AbrahamPaulJ/AutoApply.git
+cd AutoApply
+git submodule update --init --recursive
+```
+
+- Install `requirements.txt` from the root folder via pip
 - Go to the `jsoncv` folder and install the dependencies by running: `npm install`
 
 ---
