@@ -1,7 +1,7 @@
 import json
 import os
 
-user = "abraham"  # Replace with actual username or input()
+user = "abraham"  
 
 # Define paths relative to the user folder
 folder_path = os.path.join("Users", user)

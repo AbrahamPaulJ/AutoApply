@@ -8,9 +8,12 @@ import requests
 from gemini import gen_summary, is_suitable, gen_cover_letter, agenerate_resume, get_question_actions
 from utils import clear_job_ids
 
+global_filter = 1
+telegram = 1
 
-submit = True
-#clear_job_ids()
+headless = False
+submit = 0
+clear_job_ids()
 pagination = False
 looprange = 5
 timeframe = re.compile(r'(5|[1-5]\d|60)m')  # 5–60 mins
@@ -24,8 +27,10 @@ if len(sys.argv) > 2:
     looprange = sys.argv[2]
 if len(sys.argv) > 3:
     user = sys.argv[3]
+if len(sys.argv) > 4:
+    headless = sys.argv[4].lower() in ['true', '1', 'yes']
 
-
+print(f"Headless: {headless}")
 if ui_mode:
     pagination = True
     timeframe = re.compile(r'.*')
@@ -41,9 +46,10 @@ def send_telegram_message(message):
         'chat_id': CHAT_ID,
         'text': message
     }
-    response = requests.post(url, data=payload)
-    if response.status_code != 200:
-        print(f"Failed to send Telegram message: {response.text}")
+    if telegram:
+        response = requests.post(url, data=payload)
+        if response.status_code != 200:
+            print(f"Failed to send Telegram message: {response.text}")
 
 playwright = None
 browser = None
@@ -59,7 +65,7 @@ async def init_browser():
         user_data_dir = os.path.abspath(os.path.join("Users", user, "chrome_profile"))
         browser = await playwright.chromium.launch_persistent_context(
             user_data_dir= user_data_dir,
-            headless=False,
+            headless=headless,
             args=[
                 '--disable-blink-features=AutomationControlled',
                 '--no-sandbox',
@@ -77,10 +83,14 @@ async def process_job_listings():
     await browser.pages[0].close()
     page.set_default_timeout(5000)
     page.set_default_navigation_timeout(10000)
-
-    file_path = os.path.join("Users", user, "filter.txt")
+    if global_filter:
+        file_path = os.path.join("global_filter.txt")  
+    else:
+        file_path = os.path.join("Users", user, "filter.txt")
+    
     with open(file_path, "r") as f:
         AA = f.read().strip()
+    
     await page.goto(AA)
     page.set_default_navigation_timeout(5000)
 
@@ -167,7 +177,7 @@ async def process_job_listings():
                         send_telegram_message(combined_message)
                         send_telegram_message(suitable_report)
 
-                        if suitable_bool:
+                        if not suitable_bool:
                             # Suitable
                             print("Quick applying...")
 
@@ -363,7 +373,7 @@ async def process_job_listings():
 
                         else:
                             # Not suitable: send apply URL message only
-                            print("Not suitable.")
+                            print("Skipping: Not suitable.")
 
                 except Exception as e:
                     print(f"Error: No apply button detected/ already applied. Skipping.")
