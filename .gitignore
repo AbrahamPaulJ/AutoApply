@@ -10,6 +10,7 @@ chrome_profile_serve/
 ignored/
 tests/
 legacy/
+templates/
 Users/*/mycv/
 Users/*/mycl/
 analyse.py
