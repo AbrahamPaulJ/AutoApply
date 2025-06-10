@@ -19,7 +19,7 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 - A `chrome_profile` folder
   *(Must be logged into Seek)*
 - A Gemini API Key. Get one for free at https://aistudio.google.com/app/apikey
-- A Telegram number to receive the applications in real time
+- Optional: A Telegram number to receive application updates in real time
 
 ---
 
