@@ -13,7 +13,6 @@ legacy/
 templates/
 Users/*/mycv/
 Users/*/mycl/
-analyse.py
 README.md
 scrape_concurrent.bat
 asyncserve.py

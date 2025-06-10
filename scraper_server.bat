@@ -1,9 +1,10 @@
 @echo off
 setlocal
 
-set UI_MODE=0
-::set LOOPRANGE=5
-::set USER=abraham
+set UI_MODE=1
+set LOOPRANGE=5
+set USER=abraham
+set HEADLESS=1
 
 :: Time limit in minutes
 set MAX_RUNTIME_MINUTES=600
@@ -32,7 +33,7 @@ set /a elapsed_minutes=%elapsed_seconds% / 60
 if %elapsed_minutes% GEQ %MAX_RUNTIME_MINUTES% goto end
 
 :: Run asyncscrape.py in a temporary terminal
-start "" cmd /c python asyncscrape.py %UI_MODE% %LOOPRANGE% %USER%
+start "" cmd /c python asyncscrape.py %UI_MODE% %LOOPRANGE% %USER% %HEADLESS%
 
 :: Show time until next scrape
 echo [%time%] asyncscrape.py triggered. Waiting %INTERVAL_MINUTES% minutes until next run...

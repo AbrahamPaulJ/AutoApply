@@ -12,13 +12,12 @@ global_filter = 1
 telegram = 1
 
 headless = False
-submit = 0
-clear_job_ids()
+submit = 1
+#clear_job_ids()
 pagination = False
 looprange = 5
 timeframe = re.compile(r'(5|[1-5]\d|60)m')  # 5–60 mins
 ui_mode = 1
-
 user = 'abraham'
 
 if len(sys.argv) > 1:
@@ -34,6 +33,7 @@ print(f"Headless: {headless}")
 if ui_mode:
     pagination = True
     timeframe = re.compile(r'.*')
+    print("Running in UI mode.")
 
 # Telegram Bot Configuration
 CHAT_ID = get_user_field(user, "chat_id")
@@ -62,7 +62,7 @@ async def init_browser():
         print("Initializing browser...")
         playwright = await async_playwright().start()
         
-        user_data_dir = os.path.abspath(os.path.join("Users", user, "chrome_profile"))
+        user_data_dir = f".\\Users\\{user}\\chrome_profile"
         browser = await playwright.chromium.launch_persistent_context(
             user_data_dir= user_data_dir,
             headless=headless,
@@ -73,7 +73,8 @@ async def init_browser():
                 '--disable-infobars',
                 "--start-maximized",
             ],
-            no_viewport=True
+            no_viewport=True,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
         )
 
 async def process_job_listings():
@@ -84,7 +85,7 @@ async def process_job_listings():
     page.set_default_timeout(5000)
     page.set_default_navigation_timeout(10000)
     if global_filter:
-        file_path = os.path.join("global_filter.txt")  
+        file_path = os.path.join("seek_global_filter.txt")  
     else:
         file_path = os.path.join("Users", user, "filter.txt")
     
@@ -177,7 +178,7 @@ async def process_job_listings():
                         send_telegram_message(combined_message)
                         send_telegram_message(suitable_report)
 
-                        if not suitable_bool:
+                        if suitable_bool:
                             # Suitable
                             print("Quick applying...")
 
@@ -401,6 +402,9 @@ async def process_job_listings():
             except Exception:
                 print("No more pages available. Exiting loop.")
                 break
+        else:
+            print("Exiting loop.")   
+            break
 
     await page.wait_for_timeout(2000)
     await browser.close()
