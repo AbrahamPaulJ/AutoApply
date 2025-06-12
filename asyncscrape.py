@@ -371,32 +371,6 @@ async def process_job_listings():
 
                 except Exception as e:
                     print(f"Error: No apply button detected/ already applied. Skipping.")
-                    advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
-                    await advertiser_name_locator.wait_for(state='visible')
-                    advertiser_name = await advertiser_name_locator.inner_text()
-                    print(f"Advertiser name: {advertiser_name}")
-
-                    job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
-                    await job_type_locator.wait_for(state='visible')
-                    job_type = await job_type_locator.inner_text()
-                    print(f"Job type: {job_type}")
-
-                    job_location_locator = page.locator('span[data-automation="job-detail-location"]')
-                    await job_location_locator.wait_for(state='visible')
-                    job_location = await job_location_locator.inner_text()
-                    print(f"Job location: {job_location}")
-
-                    job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
-                    await job_work_type_locator.wait_for(state='visible')
-                    job_work_type = await job_work_type_locator.inner_text()
-                    print(f"Work type: {job_work_type}")
-
-                    job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
-                    raw_html = await job_details_locator.inner_html()
-
-                    # Generate summary and suitability report
-                    suitable_json = is_suitable(user, job_title, advertiser_name, job_type, job_location, job_work_type, raw_html)
-                    print(suitable_json)
                     # import traceback
                     # traceback.print_exc()
                 
