@@ -1,0 +1,105 @@
+# chat_id is the ID for your phone number on Telegram, go to t.me/seek_apply_bot
+chat_id: 7512474820
+name: Abraham Paul Jaison
+address: 184 Walkerville Terrace, Walkerville SA 5081
+phone: 0489209259
+email: abrahampauljaison2@gmail.com
+
+# 'additional_info' is the info required to answer questions asked by the recruiter during the application process. Modify the fields as required.
+additional_info: |
+  - Gender: Male
+  - Nationality: Indian
+  - Visa: Subclass 500 (Student), valid until October 2026
+  - Work Limit: 24 hours per week
+  - Location: Adelaide (Walkerville)
+  - Citizenship: Not an Australian citizen or resident
+  - Work Rights: Legally entitled to work in Australia
+  - Car: No
+  - Driver's License: No
+  - Forklift License: No
+  - Working With Children Check: No
+  - Experience: QA/testing, cleaning, hospitality, retail, data analytics, administration, bookkeeping
+  - Currently working: Yes, at AHS Hospitality
+  - Notice Period: Can give 1-week notice from current job
+  - Performance: Experienced in meeting targets and KPIs.
+
+# 'cover_letter_prompt' is the rough format for the cover letter. Modify if required but avoid editing the {} variables.
+cover_letter_prompt: |
+  Read the job description from the raw html below:
+  {raw_html}
+
+  I want you to generate a cover letter for {name} who is applying for this role. Do not mention the company names of my previous experience, do not mention work experiences that are not relevant to the job. My resume in json format:
+  {json_resume}
+
+  NOTE: Please DO NOT include any placeholders or any other hints that your response is AI generated; you can omit or guess the missing details as required. The current date is {date}. Here is a template you can follow:
+
+  {name}
+  {address}
+  {phone}
+  {email}
+
+  {date}
+
+  Hiring Manager
+  [replace with company name]
+
+  Dear Hiring Manager,
+
+  I am writing to express my keen interest in the [] position at [store/company name], as advertised on Seek. [Insert sentences based on job description and how my experience will contribute to the company]
+
+  Thank you for considering my application. I have attached my resume for your review and welcome the opportunity to discuss my qualifications further in an interview.
+
+  Sincerely,
+
+  {name}
+
+# 'resume_prompt' is the format for the resume. Modify if required but avoid editing the {} variables.
+resume_prompt: |
+  {json_resume} 
+  This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job (try to include AHS Hospitality whenever possible).  
+  You may change the summary, work, soft skills, and technical skills sections to include keywords relevant to the job description. Do **not** mention the job title or employer name explicitly in the summary (avoid phrases like "seeking a role at [company]" or job-specific tailoring).
+  You only need to include my work experience that is most relevant to the job. For administration jobs please include my IT work experience. You can omit "certificates" if it is not at all relevant to the job. 
+  Your reply must have only the json output.
+  The job title is {job_title}, and the job description is:
+  {raw_html}
+
+
+# 'suitable_prompt' is used to decide whether or not to apply for the job. Modify only the 'Instructions' as required.
+suitable_prompt: |
+  
+  This is my resume in JSON format:\n
+  {json_resume}\n
+  Additional info:\n
+  {additional_info}\n
+  Summarize and evaluate this job for my suitability:
+
+  Job Details:
+  - Name: {name}
+  - Advertised by: {adv}
+  - Job type: {jtype}
+  - Location: {loc}
+  - Work Type: {wtype}
+  - Job Description (raw HTML): {desc}
+
+  Instructions:
+  1. Check the job description and determine if I am suitable for this job.
+  2. IMPORTANT: You **must** answer "no" if **any** of these conditions are met:
+      - The job is mainly related to driving.
+      - A working with children check (WWCC) is essential.
+      - Forklift license/experience is essential.
+      - The job is for a chef requiring certifications in commercial cookery.
+      - The job is advertised by Journey Beyond.
+      - Ths job is advertised by Uniq Impressions.
+  3. Else, answer "yes" if I am generally suitable.
+  4. Provide a short reason if not suitable.
+  5. Estimate and include a confidence score (in percentage) for your decision.
+
+  Respond strictly in this JSON format:
+
+  {{
+    "suitable": true or false,
+    "reason": "Your explanation here.",
+    "confidence": 0 to 100
+  }}
+
+  If confidence is below 50%, set "suitable" to false even if no disqualifying conditions are met.

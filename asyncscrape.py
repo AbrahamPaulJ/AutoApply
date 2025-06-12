@@ -12,7 +12,8 @@ global_filter = 1
 telegram = 1
 
 headless = False
-submit = 1
+submit = 0
+debug = 0
 #clear_job_ids()
 pagination = False
 looprange = 5
@@ -23,17 +24,19 @@ user = 'abraham'
 if len(sys.argv) > 1:
     ui_mode = int(sys.argv[1])
 if len(sys.argv) > 2:
-    looprange = sys.argv[2]
+    looprange = int(sys.argv[2])
 if len(sys.argv) > 3:
     user = sys.argv[3]
 if len(sys.argv) > 4:
     headless = sys.argv[4].lower() in ['true', '1', 'yes']
 
 print(f"Headless: {headless}")
+
 if ui_mode:
     pagination = True
     timeframe = re.compile(r'.*')
     print("Running in UI mode.")
+    debug = True
 
 # Telegram Bot Configuration
 CHAT_ID = get_user_field(user, "chat_id")
@@ -54,7 +57,6 @@ def send_telegram_message(message):
 playwright = None
 browser = None
 
-
 async def init_browser():
     global playwright, browser
     
@@ -74,7 +76,7 @@ async def init_browser():
                 "--start-maximized",
             ],
             no_viewport=True,
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+          #user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
         )
 
 async def process_job_listings():
@@ -312,7 +314,6 @@ async def process_job_listings():
                                                         error_msg = f"Error: {str(e)}"
                                                         print(error_msg)
                                                         traceback.print_exc()
-                                                        messages.append(error_msg)
 
                                         try: 
                                             await cont_btn_locator.wait_for(state="visible", timeout=3000)
@@ -329,17 +330,16 @@ async def process_job_listings():
 
                                     try:
                                         privacy_checkbox = new_page.locator('//input[@type="checkbox" and contains(@id, "privacyPolicy")]')
-                                        print("checking pcbox")
+                                        print("Checking for privacy policy checkbox.")
                                         await privacy_checkbox.wait_for(state="visible", timeout=3000)
                                         if not await privacy_checkbox.is_checked(timeout=1000):
                                             await privacy_checkbox.check()
                                             print("Privacy policy checkbox checked.")  
                                     except Exception as e:
-                                                    error_msg = f"Error: {str(e)}"
+                                                    error_msg = f"No privacy policy checkbox."
                                                     print(error_msg)
                                                     import traceback
                                                     traceback.print_exc()
-                                                    messages.append(error_msg)
 
                                     try:
                                         if submit:
@@ -378,6 +378,32 @@ async def process_job_listings():
 
                 except Exception as e:
                     print(f"Error: No apply button detected/ already applied. Skipping.")
+                    advertiser_name_locator = page.locator('span[data-automation="advertiser-name"]')
+                    await advertiser_name_locator.wait_for(state='visible')
+                    advertiser_name = await advertiser_name_locator.inner_text()
+                    print(f"Advertiser name: {advertiser_name}")
+
+                    job_type_locator = page.locator('span[data-automation="job-detail-classifications"]')
+                    await job_type_locator.wait_for(state='visible')
+                    job_type = await job_type_locator.inner_text()
+                    print(f"Job type: {job_type}")
+
+                    job_location_locator = page.locator('span[data-automation="job-detail-location"]')
+                    await job_location_locator.wait_for(state='visible')
+                    job_location = await job_location_locator.inner_text()
+                    print(f"Job location: {job_location}")
+
+                    job_work_type_locator = page.locator('span[data-automation="job-detail-work-type"]')
+                    await job_work_type_locator.wait_for(state='visible')
+                    job_work_type = await job_work_type_locator.inner_text()
+                    print(f"Work type: {job_work_type}")
+
+                    job_details_locator = page.locator('div[data-automation="jobAdDetails"]')
+                    raw_html = await job_details_locator.inner_html()
+
+                    # Generate summary and suitability report
+                    suitable_json = is_suitable(user, job_title, advertiser_name, job_type, job_location, job_work_type, raw_html)
+                    print(suitable_json)
                     # import traceback
                     # traceback.print_exc()
                 
@@ -405,7 +431,8 @@ async def process_job_listings():
         else:
             print("Exiting loop.")   
             break
-
+    if debug:
+        await page.wait_for_timeout(600000)
     await page.wait_for_timeout(2000)
     await browser.close()
 

@@ -1,4 +1,4 @@
-from utils import generate_cl_prompt, generate_resume_prompt
+from utils import generate_cl_prompt, generate_resume_prompt, get_user_field
 from dotenv import load_dotenv
 import google.generativeai as genai
 import json
@@ -138,20 +138,20 @@ def is_suitable(user, name, adv, jtype, loc, wtype, desc):
             "reason": "Error: Resume file not found.",
             "confidence": 0
         }
+    
+    additional_info = get_user_field(user, "additional_info") 
 
-    try:
-        suitable_prompt = os.path.join("Users", user, "prompts", "suitable_prompt.txt")
-        with open(suitable_prompt, "r", encoding="utf-8") as f:
-            prompt_template = f.read()
-    except FileNotFoundError:
+    prompt_template = get_user_field(user, "suitable_prompt")
+    if prompt_template is None:
         return {
             "suitable": False,
-            "reason": "Error: suitable_prompt.txt not found.",
+            "reason": "Error: suitable_prompt field not found.",
             "confidence": 0
         }
 
     prompt = prompt_template.format(
         json_resume=json_resume,
+        additional_info=additional_info,
         name=name,
         adv=adv,
         jtype=jtype,
@@ -184,6 +184,8 @@ def get_question_actions(user: str, html: str):
             json_resume = file.read()
     except FileNotFoundError:
         return "Error: Resume file not found."
+    
+    additional_info = get_user_field(user, "additional_info") 
 
     prompt = f"""{json_resume}
     This is my resume in JSON format.
@@ -259,14 +261,9 @@ def get_question_actions(user: str, html: str):
         - If the question is "Are you an Australian or New Zealand Citizen?", answer "No".
         - If it's a Yes/No question and my context clearly answers it, infer the correct option (e.g., "student visa" means NOT a citizen).
 
-    Apart from my resume, here is additional context about me:
-    - Male, Indian, on student visa subclass 500 in Adelaide (Walkerville), visa expiring Oct 2026, 24hrs/week work limit.
-    - Not an Australian citizen or resident.
-    - I am legally entitled to work in Australia.
-    - I have experience working towards targets and KPIs.
-    - No car or driving license. No forklift license.
-    - I have experience in QA and testing, cleaning, hospitality, retail, data analytics, administration, bookkeeping etc.
-    - Can give 1-week notice from current job.
+    Apart from my resume, here is additional context about me:\n
+    {additional_info}\n
+
 
     HTML form:
     {html}
