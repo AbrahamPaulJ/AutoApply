@@ -8,7 +8,7 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 - Scrapes desired job listings from Seek every few minutes.
 - Use your desired filters for the jobs. Gemini API matches your details to the job listing to decide whether to complete the application.
 - If suitable, Gemini API generates a custom resume, cover letter, answers recruiter questions and applies for the job. 
-- The suitability and application status is sent via Telegram to the user in real time. 
+- The suitability and application status is sent via Telegram to the applicant in real time. 
 
 ---
 
