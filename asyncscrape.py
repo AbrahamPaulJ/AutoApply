@@ -8,7 +8,6 @@ import requests
 from gemini import gen_summary, is_suitable, gen_cover_letter, agenerate_resume, get_question_actions
 from utils import clear_job_ids
 
-global_filter = 1
 telegram = 1
 
 headless = False
@@ -86,15 +85,9 @@ async def process_job_listings():
     await browser.pages[0].close()
     page.set_default_timeout(5000)
     page.set_default_navigation_timeout(10000)
-    if global_filter:
-        file_path = os.path.join("seek_global_filter.txt")  
-    else:
-        file_path = os.path.join("Users", user, "filter.txt")
-    
-    with open(file_path, "r") as f:
-        AA = f.read().strip()
-    
-    await page.goto(AA)
+
+    jobs_page = get_user_field(user,"filter")
+    await page.goto(jobs_page)
     page.set_default_navigation_timeout(5000)
 
     while True:  # Loop to go through all pages of job listings
