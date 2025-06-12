@@ -5,10 +5,10 @@ Real time scraping and auto-applying to **"Quick Apply"** job listings on [seek.
 ---
 
 ### 🚀 Features
-- Scrapes desired job listings from Seek every 3 minutes.
+- Scrapes desired job listings from Seek every few minutes.
 - Use your desired filters for the jobs. Gemini API matches your details to the job listing to decide whether to complete the application.
-- If suitable, Gemini API generates a custom resume and cover letter and applies for the job. 
-- The suitability and application status is sent via Telegram to the user in real time. 
+- If suitable, Gemini API generates a custom resume, cover letter, answers recruiter questions and applies for the job. 
+- The suitability and application status is sent via Telegram to the applicant in real time. 
 
 ---
 
@@ -37,6 +37,5 @@ git submodule update --init --recursive
 ---
 
 ### ▶️ Run
-- Run `scraper_server.bat` to start scraping in real time.  
-**or**  
-- Run `asyncscrape.py` in UI mode to mass apply for all listings from the last 3 days.
+- Run `scraper.bat` to start scraping in real time.  
+
