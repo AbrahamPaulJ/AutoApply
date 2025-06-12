@@ -26,7 +26,7 @@ additional_info: |
   - Notice Period: Can give 1-week notice from current job
   - Performance: Experienced in meeting targets and KPIs.
 
-# 'cover_letter_prompt' is the rough format for the cover letter. Modify if required but avoid editing the {} variables.
+# 'cover_letter_prompt' is the template for the cover letter. Modify if required. Avoid editing the {} variables.
 cover_letter_prompt: |
   Read the job description from the raw html below:
   {raw_html}
@@ -56,7 +56,7 @@ cover_letter_prompt: |
 
   {name}
 
-# 'resume_prompt' is the format for the resume. Modify if required but avoid editing the {} variables.
+# 'resume_prompt' is the template for the resume. Modify if required. Avoid editing the {} variables.
 resume_prompt: |
   {json_resume} 
   This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job (try to include AHS Hospitality whenever possible).  
