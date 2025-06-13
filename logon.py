@@ -33,10 +33,6 @@ with sync_playwright() as p:
     page = browser.new_page()
     browser.pages[0].close()
     page.goto("https://login.seek.com/")
-    # ipage = browser.new_page()
-    # stealth_sync(ipage)
-    # ipage.goto("https://au.indeed.com/?from=gnav-util-homepage")
-    # Wait for manual login
     input("Log in manually and then press Enter to continue...")
 
     print("Logged in successfully!")
