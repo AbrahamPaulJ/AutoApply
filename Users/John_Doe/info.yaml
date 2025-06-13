@@ -1,17 +1,20 @@
-chat_id: 7512474820
-name: Abraham Paul Jaison
-address: 184 Walkerville Terrace, Walkerville SA 5081
-phone: 0489209259
-email: abrahampauljaison2@gmail.com
+# chat_id is the ID for your phone number on Telegram, go to t.me/seek_apply_bot
+chat_id: 12345678
+name: John Doe
+address: 123 Street
+phone: 000000000
+email: abc@xyz.com
 
+# On the Seek homepage filter the jobs you are looking for and paste the url below. Choose 'listed in the 3 days' for the time filter.
 filter: https://www.seek.com.au/jobs/in-All-Adelaide-SA?classification=6251%2C1200%2C1204%2C6163%2C1209%2C1212%2C6281%2C6092%2C6008%2C6043%2C6362%2C1223%2C1225&daterange=3&sortmode=ListedDate&worktype=243%2C245%2C244
 
+# 'additional_info' is the info required to answer questions asked by the recruiter during the application process. Modify (add/edit/delete) the lines as you wish.
 additional_info: |
   - Gender: Male
   - Nationality: Indian
-  - Visa: Subclass 500 (Student), valid until October 2026
+  - Visa: Subclass 500 (Student), valid until Feb 2027
   - Work Limit: 24 hours per week
-  - Location: Adelaide (Walkerville)
+  - Location: Adelaide 
   - Citizenship: Not an Australian citizen or resident
   - Work Rights: Legally entitled to work in Australia
   - Car: No
@@ -19,11 +22,12 @@ additional_info: |
   - Forklift License: No
   - Working With Children Check: No
   - Police Check: No (Willing to get)
-  - Experience: QA/testing, cleaning, hospitality, retail, data analytics, administration, bookkeeping
-  - Currently working: Yes, at AHS Hospitality
+  - Experience: cleaning, hospitality, retail
+  - Currently working: Yes, at XYZ company
   - Notice Period: Can give 1-week notice from current job
-  - Performance: Experienced in meeting targets and KPIs.
 
+
+# 'cover_letter_prompt' is the template for the cover letter. Modify if required. DO NOT EDIT the {} variables.
 cover_letter_prompt: |
   Read the job description from the raw html below:
   {raw_html}
@@ -53,15 +57,19 @@ cover_letter_prompt: |
 
   {name}
 
+# 'resume_prompt' is the template for the resume. Modify if required. DO NOT EDIT the {} variables.
 resume_prompt: |
   {json_resume} 
   This is my resume in JSON format, and I want you to modify it to fit the job description. You only need to include my work that is most relevant to the job (try to include AHS Hospitality whenever possible).  
   You may change the summary, work, soft skills, and technical skills sections to include keywords relevant to the job description. Do **not** mention the job title or employer name explicitly in the summary (avoid phrases like "seeking a role at [company]" or job-specific tailoring).
-  You only need to include my work experience that is most relevant to the job. For administration jobs please include my IT work experience. You can omit "certificates" if it is not at all relevant to the job. 
+  You only need to include my work experience that is most relevant to the job. You can omit "certificates" if it is not at all relevant to the job. 
   Your reply must have only the json output.
   The job title is {job_title}, and the job description is:
   {raw_html}
 
+# 'suitable_prompt' is used to decide which jobs are to be skipped.
+# Modify only the disqualifying conditions (under instruction 2). 
+# For example, if you don't want a job related to driving, add "- The job is mainly related to driving." 
 suitable_prompt: |
   
   This is my resume in JSON format:\n
@@ -86,7 +94,6 @@ suitable_prompt: |
       - Forklift license/experience is essential.
       - The job is for a chef requiring certifications in commercial cookery.
       - The job is advertised by Journey Beyond.
-      - Ths job is advertised by Uniq Impressions.
   3. Else, answer "yes" if I am generally suitable.
   4. Provide a short reason if not suitable.
   5. Estimate and include a confidence score (in percentage) for your decision.

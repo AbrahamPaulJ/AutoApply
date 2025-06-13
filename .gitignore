@@ -10,9 +10,14 @@ chrome_profile_serve/
 ignored/
 tests/
 legacy/
+latest_logs/
 templates/
+Users/abraham
 Users/*/mycv/
 Users/*/mycl/
 README.md
 scrape_concurrent.bat
 asyncserve.py
+indeed_global_filter.txt
+gemini_sync.py
+sbase.py

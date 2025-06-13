@@ -1,0 +1,214 @@
+{
+  "$schema": "",
+  "basics": {
+    "name": "John Doe",
+    "label": "",
+    "image": "",
+    "email": "johndoe@example.com",
+    "phone": "0400000000",
+    "url": "",
+    "summary": "Master's student in Artificial Intelligence and Machine Learning, seeking a retail role to further develop people skills while balancing studies. With 6 months of retail experience, quick learner, highly adaptable, and thrive in fast-paced environments. Strong customer-first approach and effective in both independent and team settings. Available to work any shift on all days.",
+    "location": {
+      "address": "123 Example Street, Exampleville",
+      "postalCode": "",
+      "city": "Exampleville",
+      "countryCode": "",
+      "region": "Australia"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "name": "Example Hospitality, Express Hotel",
+      "location": "Express Hotel, City Centre",
+      "description": "",
+      "position": "Room Attendant",
+      "url": "",
+      "startDate": "2025-03-27",
+      "endDate": "",
+      "summary": "- Performed general cleaning duties including vacuuming, sweeping and mopping.\n- Changed linen and made beds.\n- Cleaned showers, baths, sinks and kitchens.\n- Removed used guest amenities and rubbish, and replenished supplies.\n- Worked at fast pace while maintaining high standards of cleanliness.",
+      "highlights": []
+    },
+    {
+      "name": "Retail Essentials",
+      "location": "Example City, Australia",
+      "description": "",
+      "position": "Sales Associate",
+      "url": "",
+      "startDate": "2024-08-07",
+      "endDate": "2025-01-21",
+      "summary": "- Assisted customers with questions and provided product recommendations.\n- Restocked shelves and conducted stock counts regularly.\n- Operated the cash register.\n- Tracked sales and inventory data.\n- Assisted in receiving and storing deliveries.",
+      "highlights": []
+    },
+    {
+      "name": "Example Café",
+      "location": "Example City, Australia",
+      "description": "",
+      "position": "Kitchen Hand & Waitstaff",
+      "url": "",
+      "startDate": "2024-01-10",
+      "endDate": "2024-06-10",
+      "summary": "- Assisted in food preparation such as chopping vegetables, plating dishes, and preparing simple meals.\n- Served guests promptly.\n- Answered questions about the menu and provided recommendations.\n- Washed dishes and kitchen equipment.\n- Set up and cleared tables.",
+      "highlights": []
+    },
+    {
+      "name": "Tech Innovations Ltd",
+      "location": "Example City, Australia",
+      "description": "",
+      "position": "Test Engineer",
+      "url": "",
+      "startDate": "2022-08-01",
+      "endDate": "2023-05-31",
+      "summary": "- Worked on manual and automation testing.\n- Automated over 50 test cases.\n- Tools/Languages: Testrail, Jira, Selenium, Playwright, Postman, Allure Reports, Java, and Python.",
+      "highlights": []
+    },
+    {
+      "name": "Tech Innovations Ltd",
+      "location": "Example City, Australia",
+      "description": "",
+      "position": "Junior Bookkeeper",
+      "url": "",
+      "startDate": "2023-12-01",
+      "endDate": "2024-08-01",
+      "summary": "- Used accounting software for invoicing, bill management, and reconciliations.\n- Reviewed financial reports and inventory data.\n- Maintained accurate customer/supplier records.",
+      "highlights": []
+    },
+    {
+      "name": "Tech Innovations Ltd",
+      "location": "Example City, Australia",
+      "description": "",
+      "position": "Data Analyst",
+      "url": "",
+      "startDate": "2023-06-01",
+      "endDate": "2023-12-31",
+      "summary": "- Created dashboards and analyzed trends.\n- Tools: Power BI, Power Apps, Power Automate, Azure, Python.",
+      "highlights": []
+    }
+  ],
+  "volunteer": [],
+  "education": [
+    {
+      "institution": "The University of Example",
+      "url": "",
+      "area": "",
+      "studyType": "Master of Artificial Intelligence and Machine Learning",
+      "startDate": "2025-02-02",
+      "endDate": "2026-11-01",
+      "score": "",
+      "courses": []
+    },
+    {
+      "institution": "Example Public School",
+      "url": "",
+      "area": "",
+      "studyType": "Year 10 Equivalent",
+      "startDate": "2015-06-10",
+      "endDate": "2016-04-10",
+      "score": "95.00%",
+      "courses": []
+    },
+    {
+      "institution": "Example Public School",
+      "url": "",
+      "area": "",
+      "studyType": "Year 12 Equivalent",
+      "startDate": "2017-06-06",
+      "endDate": "2018-04-10",
+      "score": "88.00%",
+      "courses": []
+    },
+    {
+      "institution": "Example School of Engineering and Technology",
+      "url": "",
+      "area": "",
+      "studyType": "Bachelor of Technology in Electronics and Communication",
+      "startDate": "2018-06-04",
+      "endDate": "2022-04-13",
+      "score": "74.70%",
+      "courses": []
+    }
+  ],
+  "awards": [],
+  "certificates": [
+    {
+      "name": "Responsible Service of Alcohol",
+      "date": "2025-02-28",
+      "url": "",
+      "issuer": "Training Provider - Document #00000000"
+    },
+    {
+      "name": "Do Food Safely",
+      "date": "2025-03-15",
+      "url": "",
+      "issuer": "Department of Health - Certificate #00000000"
+    }
+  ],
+  "publications": [],
+  "skills": [
+    {
+      "name": "Soft Skills",
+      "keywords": [
+        "Customer Service",
+        "Active Listening",
+        "Strong Verbal Communication",
+        "Friendly and Approachable",
+        "Positive Attitude",
+        "Conflict Resolution",
+        "Empathy and Patience",
+        "Helping Colleagues",
+        "Adaptability to Different Roles",
+        "Working Under Pressure",
+        "Problem-Solving",
+        "Numerical Proficiency",
+        "Teamwork and Collaboration",
+        "Time Management"
+      ]
+    },
+    {
+      "name": "Technical Skills",
+      "keywords": [
+        "Xero",
+        "MyOB",
+        "Bank Reconciliation",
+        "Accounts Payable & Receivable",
+        "General Ledger Management",
+        "Invoice Processing",
+        "Payroll Processing",
+        "Cash Handling & POS Operation",
+        "Inventory Management",
+        "Stock Receiving & Storage",
+        "Restocking Shelves",
+        "Product Knowledge",
+        "Merchandising & Display Setup",
+        "Loss Prevention Awareness",
+        "Conducting Stock Counts Regularly",
+        "Store Cleanliness & Safety",
+        "Compliance",
+        "Basic Sales & Upselling",
+        "Tracking Sales and Inventory Data",
+        "Dashboard Creation",
+        "Data Analytics",
+        "Data Cleaning & Preprocessing",
+        "Excel",
+        "Power BI",
+        "Power Platform",
+        "Java",
+        "Python",
+        "Selenium",
+        "SQL",
+        "AI Tools - Development & Prompting"
+      ]
+    }
+  ],
+  "languages": [],
+  "interests": [],
+  "references": [],
+  "projects": [],
+  "sideProjects": [],
+  "meta": {
+    "name": "",
+    "canonical": "",
+    "version": "",
+    "lastModified": "2025-03-10T18:28:18+10:30Z"
+  }
+}
