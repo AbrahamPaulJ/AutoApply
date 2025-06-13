@@ -52,7 +52,7 @@ def gen_cover_letter(user, job_id, job_title, advertiser_name, raw_html, cl_extr
     out_dir = os.path.join("Users", user, "mycl")
     os.makedirs(out_dir, exist_ok=True)
 
-    filename = f"{job_title[:10]}_{advertiser_name[:10]}_{job_id}.txt"
+    filename = f"{job_title[:20]}_{advertiser_name[:20]}_{job_id}.txt"
     filename = re.sub(r'[\\/*?:"<>| ]', '_', filename)
     txt_file_path = os.path.join(out_dir, filename)
 
@@ -113,7 +113,7 @@ async def agenerate_resume(user, job_id, job_title, advertiser_name, raw_html, r
 
     try:
         html_file_path = os.path.join(USER_DIR, 'index.html')
-        filename = f"{job_title[:10]}_{advertiser_name[:10]}_{job_id}.pdf"
+        filename = f"{job_title[:20]}_{advertiser_name[:20]}_{job_id}.pdf"
         filename = re.sub(r'[\\/*?:"<>| ]', '_', filename)
         pdf_file_path = os.path.join(USER_DIR, filename)
 

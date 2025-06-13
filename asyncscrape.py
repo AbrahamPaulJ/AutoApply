@@ -11,7 +11,7 @@ from utils import clear_job_ids
 telegram = 1
 
 headless = False
-submit = 0
+submit = 1
 debug = 0
 #clear_job_ids()
 pagination = False
@@ -75,7 +75,7 @@ async def init_browser():
                 "--start-maximized",
             ],
             no_viewport=True,
-          #user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+          user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
         )
 
 async def process_job_listings():
@@ -169,9 +169,15 @@ async def process_job_listings():
                         suitable_report = f"{status_line}\n\n{reason_line}".strip()
 
                         # Send summary and suitability report on Telegram
-                        combined_message = f"{job_title} @ {advertiser_name} ({job_id})\n\n{summary}"
-                        send_telegram_message(combined_message)
-                        send_telegram_message(suitable_report)
+                        header = f"{job_title} @ {advertiser_name} ({job_id})"
+
+                        if suitable_bool:
+                            combined_message = f"{header}\n\n{summary}"
+                            send_telegram_message(combined_message)
+                            send_telegram_message(suitable_report)
+                        else:
+                            combined_message = f"{header}\n\n{suitable_report}"
+                            send_telegram_message(combined_message)
 
                         if suitable_bool:
                             # Suitable
@@ -226,7 +232,7 @@ async def process_job_listings():
                                     print(f"Resume uploaded from: {file_path}")
 
                                     print("Generating cover letter...")
-                                    cover_letter, _ = gen_cover_letter(user, job_title, advertiser_name, raw_html, raw_html, cl_extra)
+                                    cover_letter, _ = gen_cover_letter(user, job_id, job_title, advertiser_name, raw_html, cl_extra)
                                     print("Cover letter generated.")
 
                                     print("Locating cover letter radio button...")
@@ -252,11 +258,9 @@ async def process_job_listings():
 
                                     try:
                                         await cont_btn_locator.wait_for(state="visible", timeout=3000)
-                                        await cont_btn_locator.click()
-                                        
-
+                                        await cont_btn_locator.click(timeout=3000)
+                                        await new_page.wait_for_load_state("domcontentloaded")
                                         career_history = new_page.locator("//h3[text()='Career history']")
-
                                         if await career_history.is_visible(timeout=5000):
                                             print("Bypassed Q&A, proceeding to Career History page...!\n")  
                                         else:
@@ -366,7 +370,6 @@ async def process_job_listings():
                                     await page.bring_to_front()
 
                         else:
-                            # Not suitable: send apply URL message only
                             print("Skipping: Not suitable.")
 
                 except Exception as e:
